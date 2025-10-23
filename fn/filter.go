@@ -19,3 +19,23 @@ func FilterI[T any](slice []T, fn func(T) bool) []int {
 	}
 	return out
 }
+
+func FilterTruthy[T any](slice []T) []T {
+	var out []T
+	for _, value := range slice {
+		if !Falsy(value) {
+			out = append(out, value)
+		}
+	}
+	return out
+}
+
+func FilterITruthy[T any](slice []T) []int {
+	var out []int
+	for i, value := range slice {
+		if !Falsy(value) {
+			out = append(out, i)
+		}
+	}
+	return out
+}

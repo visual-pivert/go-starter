@@ -51,3 +51,39 @@ func TestFilterI(t *testing.T) {
 
 	}
 }
+
+func TestFilterTruthy(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []any
+		expected []any
+	}{
+		{"filter truthy", []any{1, 0, "", "a", false}, []any{1, "a"}},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			got := FilterTruthy(testCase.value)
+			if SameSlice(got, testCase.expected) == false {
+				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+			}
+		})
+	}
+}
+
+func TestFilterITruthy(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []any
+		expected []int
+	}{
+		{"filterI truthy", []any{1, 0, "", "a", false}, []int{0, 3}},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			got := FilterITruthy(testCase.value)
+			if SameSlice(got, testCase.expected) == false {
+				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+			}
+		})
+	}
+}
