@@ -34,10 +34,10 @@ func TestFilterI(t *testing.T) {
 		fn       func(any) bool
 		expected []int
 	}{
-		{"filter even number", []any{1, 2, 3}, func(value any) bool { return value.(int)%2 == 0 }, []int{1}},
-		{"filter odd number", []any{1, 2, 3}, func(value any) bool { return value.(int)%2 == 1 }, []int{0, 2}},
-		{"filter 0", []any{1, 2, 3}, func(value any) bool { return value.(int) == 0 }, []int{}},
-		{"filter length name > 2", []any{"qwe", "qw", "q"}, func(value any) bool { return len(value.(string)) > 2 }, []int{0}},
+		{"filterI even number", []any{1, 2, 3}, func(value any) bool { return value.(int)%2 == 0 }, []int{1}},
+		{"filterI odd number", []any{1, 2, 3}, func(value any) bool { return value.(int)%2 == 1 }, []int{0, 2}},
+		{"filterI 0", []any{1, 2, 3}, func(value any) bool { return value.(int) == 0 }, []int{}},
+		{"filterI length name > 2", []any{"qwe", "qw", "q"}, func(value any) bool { return len(value.(string)) > 2 }, []int{0}},
 	}
 
 	for _, testCase := range testCases {
