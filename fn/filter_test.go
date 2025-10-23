@@ -26,3 +26,28 @@ func TestFilter(t *testing.T) {
 
 	}
 }
+
+func TestFilterI(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []any
+		fn       func(any) bool
+		expected []int
+	}{
+		{"filter even number", []any{1, 2, 3}, func(value any) bool { return value.(int)%2 == 0 }, []int{1}},
+		{"filter odd number", []any{1, 2, 3}, func(value any) bool { return value.(int)%2 == 1 }, []int{0, 2}},
+		{"filter 0", []any{1, 2, 3}, func(value any) bool { return value.(int) == 0 }, []int{}},
+		{"filter length name > 2", []any{"qwe", "qw", "q"}, func(value any) bool { return len(value.(string)) > 2 }, []int{0}},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			got := FilterI(testCase.value, testCase.fn)
+			if SameSlice(got, testCase.expected) == false {
+				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+			}
+
+		})
+
+	}
+}
