@@ -1,6 +1,6 @@
 package is
 
-func IsZero(value any) bool {
+func Zero(value any) bool {
 	switch v := value.(type) {
 	case int:
 		return v == 0

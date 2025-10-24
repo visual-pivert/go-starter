@@ -27,5 +27,5 @@ func Falsy(value any) bool {
 	}
 
 	// Check numeric types
-	return IsZero(value)
+	return Zero(value)
 }
