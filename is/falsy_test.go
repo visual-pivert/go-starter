@@ -1,8 +1,8 @@
-package fn
+package is
 
 import "testing"
 
-func TestFalsy(t *testing.T) {
+func TestIsFalsy(t *testing.T) {
 	testCases := []struct {
 		name     string
 		value    any

@@ -1,4 +1,4 @@
-package fn
+package is
 
 func Falsy(value any) bool {
 	if value == nil {

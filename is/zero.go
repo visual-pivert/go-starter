@@ -1,4 +1,4 @@
-package fn
+package is
 
 func IsZero(value any) bool {
 	switch v := value.(type) {
