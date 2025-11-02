@@ -1,6 +1,10 @@
 package fn
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/visual-pivert/go-starter/is"
+)
 
 func TestFilter(t *testing.T) {
 	testCases := []struct {
@@ -81,6 +85,26 @@ func TestFilterITruthy(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
 			got := FilterITruthy(testCase.value)
+			if SameSlice(got, testCase.expected) == false {
+				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+			}
+		})
+	}
+}
+
+func TestFilterToBoolStatement(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []any
+		expected []bool
+	}{
+		{"filter truthy to bool statement", []any{1, 0, "", "a", false}, []bool{true, false, false, true, false}},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			got := FilterToBoolStatement(testCase.value, func(value any) bool {
+				return is.Truthy(value)
+			})
 			if SameSlice(got, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}

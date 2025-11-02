@@ -41,3 +41,11 @@ func FilterITruthy[T any](slice []T) []int {
 	}
 	return out
 }
+
+func FilterToBoolStatement[T any](slice []T, fn func(T) bool) []bool {
+	var out []bool
+	for _, value := range slice {
+		out = append(out, fn(value))
+	}
+	return out
+}
