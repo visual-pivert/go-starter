@@ -1,6 +1,10 @@
 package fn
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/visual-pivert/go-starter/is"
+)
 
 func TestReduce(t *testing.T) {
 	testCases := []struct {
@@ -18,7 +22,7 @@ func TestReduce(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
 			got := Reduce(testCase.value, testCase.initialValue, testCase.fn)
-			if SameSlice(got, testCase.expected) == false {
+			if is.SameSlice(got, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 		})

@@ -3,7 +3,6 @@ package series
 import (
 	"testing"
 
-	"github.com/visual-pivert/go-starter/fn"
 	"github.com/visual-pivert/go-starter/is"
 )
 
@@ -22,7 +21,7 @@ func TestSeries_Append(t *testing.T) {
 		t.Run(testCase.name, func(tt *testing.T) {
 			series := NewSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.Append(4)
-			if fn.SameSlice(got.data, testCase.expected) == false {
+			if is.SameSlice(got.data, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 			if got.Len() != testCase.expectedLen {
@@ -47,7 +46,7 @@ func TestSeries_AppendSeries(t *testing.T) {
 		t.Run(testCase.name, func(tt *testing.T) {
 			series := NewSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.AppendSlice([]any{4, 5})
-			if fn.SameSlice(got.data, testCase.expected) == false {
+			if is.SameSlice(got.data, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 			if got.Len() != testCase.expectedLen {
@@ -94,7 +93,7 @@ func TestSeries_Set(t *testing.T) {
 		t.Run(testCase.name, func(tt *testing.T) {
 			series := NewSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.Set(testCase.indexToSet, testCase.newValue)
-			if fn.SameSlice(got.data, testCase.expected) == false {
+			if is.SameSlice(got.data, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 		})
@@ -140,7 +139,7 @@ func TestSeries_FilerToBoolStatement(t *testing.T) {
 		t.Run(testCase.name, func(tt *testing.T) {
 			series := NewSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.FilerToBoolStatement(testCase.fn)
-			if fn.SameSlice(got, testCase.expected) == false {
+			if is.SameSlice(got, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 		})
@@ -162,7 +161,7 @@ func TestSeries_IntersectWithBoolStatement(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			series := NewSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.IntersectWithBoolStatement(testCase.boolStatement)
-			if fn.SameSlice(got.data, testCase.expected) == false {
+			if is.SameSlice(got.data, testCase.expected) == false {
 				t.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 		})
@@ -185,7 +184,7 @@ func TestSeries_ApplyWithBoolStatement(t *testing.T) {
 		t.Run(testCase.name, func(tt *testing.T) {
 			series := NewSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.ApplyWithBoolStatement(testCase.boolStatement, testCase.fn)
-			if fn.SameSlice(got.data, testCase.expected) == false {
+			if is.SameSlice(got.data, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 		})

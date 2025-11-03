@@ -1,4 +1,4 @@
-package fn
+package is
 
 func SameSlice[T comparable](slice1 []T, slice2 []T) bool {
 	if len(slice1) != len(slice2) {

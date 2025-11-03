@@ -1,6 +1,10 @@
 package fn
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/visual-pivert/go-starter/is"
+)
 
 func TestMap(t *testing.T) {
 	useCases := []struct {
@@ -16,7 +20,7 @@ func TestMap(t *testing.T) {
 	for _, useCase := range useCases {
 		t.Run(useCase.name, func(t *testing.T) {
 			got := Map(useCase.value, useCase.fn)
-			if !SameSlice(got, useCase.expected) {
+			if !is.SameSlice(got, useCase.expected) {
 				t.Errorf("Expected %v, got %v", useCase.expected, got)
 			}
 		})
@@ -37,7 +41,7 @@ func TestMapReverse(t *testing.T) {
 	for _, useCase := range useCases {
 		t.Run(useCase.name, func(t *testing.T) {
 			got := MapReverse(useCase.value, useCase.fn)
-			if !SameSlice(got, useCase.expected) {
+			if !is.SameSlice(got, useCase.expected) {
 				t.Errorf("Expected %v, got %v", useCase.expected, got)
 			}
 		})

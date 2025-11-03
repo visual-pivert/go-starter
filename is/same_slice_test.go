@@ -1,6 +1,8 @@
-package fn
+package is
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSameSlice(t *testing.T) {
 	useCases := []struct {

@@ -22,7 +22,7 @@ func TestFilter(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
 			got := Filter(testCase.value, testCase.fn)
-			if SameSlice(got, testCase.expected) == false {
+			if is.SameSlice(got, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 
@@ -47,7 +47,7 @@ func TestFilterI(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
 			got := FilterI(testCase.value, testCase.fn)
-			if SameSlice(got, testCase.expected) == false {
+			if is.SameSlice(got, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 
@@ -67,7 +67,7 @@ func TestFilterTruthy(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
 			got := FilterTruthy(testCase.value)
-			if SameSlice(got, testCase.expected) == false {
+			if is.SameSlice(got, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 		})
@@ -85,7 +85,7 @@ func TestFilterITruthy(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
 			got := FilterITruthy(testCase.value)
-			if SameSlice(got, testCase.expected) == false {
+			if is.SameSlice(got, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 		})
@@ -105,7 +105,7 @@ func TestFilterToBoolStatement(t *testing.T) {
 			got := FilterToBoolStatement(testCase.value, func(value any) bool {
 				return is.Truthy(value)
 			})
-			if SameSlice(got, testCase.expected) == false {
+			if is.SameSlice(got, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
 		})
