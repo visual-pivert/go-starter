@@ -99,5 +99,6 @@ func (s *Series) IntersectWithBoolStatement(boolSlice []bool) *Series {
 			d.data = append(d.data, value)
 		}
 	}
+	d.len = len(d.data)
 	return d
 }

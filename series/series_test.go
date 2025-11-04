@@ -154,8 +154,9 @@ func TestSeries_IntersectWithBoolStatement(t *testing.T) {
 		value         []any
 		boolStatement []bool
 		expected      []any
+		expectedLen   int
 	}{
-		{"intersect with even bool statement", "header", IntType, []any{1, 2, 3}, []bool{false, true, false}, []any{2}},
+		{"intersect with even bool statement", "header", IntType, []any{1, 2, 3}, []bool{false, true, false}, []any{2}, 1},
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -163,6 +164,9 @@ func TestSeries_IntersectWithBoolStatement(t *testing.T) {
 			got := series.IntersectWithBoolStatement(testCase.boolStatement)
 			if is.SameSlice(got.data, testCase.expected) == false {
 				t.Errorf("Expected %v, got %v", testCase.expected, got)
+			}
+			if got.Len() != testCase.expectedLen {
+				t.Errorf("Expected %v, got %v", testCase.expectedLen, got.Len())
 			}
 		})
 	}
