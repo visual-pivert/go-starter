@@ -18,6 +18,29 @@ func createDf() *Df {
 	return dataframe
 }
 
+func TestDf_Types(t *testing.T) {
+	testCases := []struct {
+		name           string
+		df             *Df
+		expected       []series.SeriesType
+		expectedString []string
+	}{
+		{"types", createDf(), []series.SeriesType{series.StringType, series.IntType, series.FloatType, series.BoolType, series.TimeType}, []string{"string", "int", "float", "bool", "time"}},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			got := testCase.df.Types()
+			gotStr := testCase.df.TypesToString()
+			if !is.SameSlice(got, testCase.expected) {
+				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+			}
+			if !is.SameSlice(gotStr, testCase.expectedString) {
+				tt.Errorf("Expected %v, got %v", testCase.expectedString, gotStr)
+			}
+		})
+	}
+}
+
 func TestDf_GetSeries(t *testing.T) {
 	testCases := []struct {
 		name               string

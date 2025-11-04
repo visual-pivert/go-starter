@@ -44,6 +44,23 @@ func (dataframe *Df) Columns() []string {
 	return dataframe.columns
 }
 
+func (dataframe *Df) Types() []series.SeriesType {
+	var out []series.SeriesType
+	for _, s := range dataframe.data {
+		out = append(out, s.Type())
+	}
+	return out
+}
+
+func (dataframe *Df) TypesToString() []string {
+	t := dataframe.Types()
+	var out []string
+	for _, s := range t {
+		out = append(out, string(s))
+	}
+	return out
+}
+
 func (dataframe *Df) GetSeries(idx int) *series.Series {
 	return dataframe.data[idx]
 }
