@@ -8,10 +8,10 @@ import (
 	"github.com/visual-pivert/go-starter/series"
 )
 
-func ToDf(raw [][]any, headerIdx int) *df.Df {
+func ToDf(raw [][]string, headerIdx int) *df.Df {
 	var headers []string
 	for i := 0; i < len(raw); i++ {
-		headers = append(headers, raw[i][headerIdx].(string))
+		headers = append(headers, raw[i][headerIdx])
 	}
 	out := df.NewDf()
 	for i := 0; i < len(headers); i++ {
