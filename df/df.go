@@ -1,7 +1,9 @@
 package df
 
 import (
+	"fmt"
 	"math"
+	"strings"
 
 	"github.com/visual-pivert/go-starter/fn"
 	"github.com/visual-pivert/go-starter/series"
@@ -111,4 +113,87 @@ func (dataframe *Df) RemoveColumnsByHeader(names ...string) *Df {
 		}
 	}
 	return NewDf(newSeries...)
+}
+
+func (dataframe *Df) ToMdString() string {
+	cols := len(dataframe.columns)
+	if cols == 0 {
+		return ""
+	}
+
+	rows := dataframe.shape[0]
+
+	// Compute column widths from headers and all visible values
+	widths := make([]int, cols)
+	for j := 0; j < cols; j++ {
+		w := len(dataframe.columns[j] + "(" + dataframe.TypesToString()[j] + ")")
+		col := dataframe.data[j]
+		for i := 0; i < rows; i++ {
+			var v any
+			if i < col.Len() {
+				v = col.Get(i)
+			} else {
+				v = ""
+			}
+			s := fmt.Sprint(v)
+			if l := len(s); l > w {
+				w = l
+			}
+		}
+		// Markdown requires at least 3 dashes in the separator
+		if w < 3 {
+			w = 3
+		}
+		widths[j] = w
+	}
+
+	pad := func(s string, w int) string {
+		if len(s) >= w {
+			return s
+		}
+		return s + strings.Repeat(" ", w-len(s))
+	}
+
+	lines := make([]string, 0, rows+2)
+	// Header row
+	{
+		row := "|"
+		for j := 0; j < cols; j++ {
+			row += " " + pad(dataframe.columns[j]+"("+dataframe.TypesToString()[j]+")", widths[j]) + " |"
+		}
+		lines = append(lines, row)
+	}
+	// Separator row (at least 3 dashes per column)
+	{
+		row := "|"
+		for j := 0; j < cols; j++ {
+			nd := widths[j]
+			if nd < 3 {
+				nd = 3
+			}
+			row += " " + strings.Repeat("-", nd) + " |"
+		}
+		lines = append(lines, row)
+	}
+	// Data rows
+	for i := 0; i < rows; i++ {
+		row := "|"
+		for j := 0; j < cols; j++ {
+			col := dataframe.data[j]
+			var v any
+			if i < col.Len() {
+				v = col.Get(i)
+			} else {
+				v = ""
+			}
+			row += " " + pad(fmt.Sprint(v), widths[j]) + " |"
+		}
+		lines = append(lines, row)
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+func (dataframe *Df) Debug() {
+	fmt.Println(dataframe.ToMdString())
 }

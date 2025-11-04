@@ -94,6 +94,8 @@ func TestDf_RemoveSeries(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
 			got := testCase.df.RemoveColumns(testCase.idx...)
+			testCase.df.Debug()
+			got.Debug()
 			if got.Shape()[1] != testCase.expectedLen {
 				tt.Errorf("Expected %v, got %v", testCase.expectedLen, got.Shape()[1])
 			}
