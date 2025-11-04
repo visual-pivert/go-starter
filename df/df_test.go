@@ -147,3 +147,22 @@ func TestDf_Shape(t *testing.T) {
 		})
 	}
 }
+
+func TestDf_IntersectWithBoolStatement(t *testing.T) {
+	testCases := []struct {
+		name          string
+		df            *Df
+		boolStatement []bool
+		expectedShape []int
+	}{
+		{"intersect with bool statement", createDf(), []bool{true, false, true}, []int{2, 5}},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			got := testCase.df.IntersectWithBoolStatement(testCase.boolStatement)
+			if !is.SameSlice(got.Shape(), testCase.expectedShape) {
+				tt.Errorf("Expected %v, got %v", testCase.expectedShape, got.Shape())
+			}
+		})
+	}
+}

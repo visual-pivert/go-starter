@@ -115,6 +115,30 @@ func (dataframe *Df) RemoveColumnsByHeader(names ...string) *Df {
 	return NewDf(newSeries...)
 }
 
+func (dataframe *Df) GetLine(idx int) []any {
+	var out []any
+	for _, s := range dataframe.data {
+		out = append(out, s.Get(idx))
+	}
+	return out
+}
+
+func (dataframe *Df) GetLines(indexes ...int) [][]any {
+	var out [][]any
+	for _, i := range indexes {
+		out = append(out, dataframe.GetLine(i))
+	}
+	return out
+}
+
+func (dataframe *Df) IntersectWithBoolStatement(boolSlice []bool) *Df {
+	var s []*series.Series
+	for _, d := range dataframe.data {
+		s = append(s, d.IntersectWithBoolStatement(boolSlice))
+	}
+	return NewDf(s...)
+}
+
 func (dataframe *Df) ToMdString() string {
 	cols := len(dataframe.columns)
 	if cols == 0 {
