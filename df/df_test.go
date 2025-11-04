@@ -3,6 +3,7 @@ package df
 import (
 	"testing"
 
+	"github.com/visual-pivert/go-starter/fn"
 	"github.com/visual-pivert/go-starter/is"
 	"github.com/visual-pivert/go-starter/series"
 )
@@ -162,6 +163,50 @@ func TestDf_IntersectWithBoolStatement(t *testing.T) {
 			got := testCase.df.IntersectWithBoolStatement(testCase.boolStatement)
 			if !is.SameSlice(got.Shape(), testCase.expectedShape) {
 				tt.Errorf("Expected %v, got %v", testCase.expectedShape, got.Shape())
+			}
+		})
+	}
+}
+
+func TestDf_GetLine(t *testing.T) {
+	testCases := []struct {
+		name         string
+		df           *Df
+		idx          int
+		expectedLine []any
+	}{
+		{"get line", createDf(), 0, []any{"a", 1, 1.1, true, "2025/10/04"}},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			got := testCase.df.GetLine(testCase.idx)
+			if !is.SameSlice(got, testCase.expectedLine) {
+				tt.Errorf("Expected %v, got %v", testCase.expectedLine, got)
+			}
+		})
+	}
+}
+
+func TestDf_GetLines(t *testing.T) {
+	testCases := []struct {
+		name         string
+		df           *Df
+		idx          []int
+		expectedLine [][]any
+	}{
+		{"get lines", createDf(), []int{0, 1}, [][]any{{"a", 1, 1.1, true, "2025/10/04"}, {"b", 2, 2.2, false, "2025/11/11"}}},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			got := testCase.df.GetLines(testCase.idx...)
+			boolStatement := fn.Map(got, func(t []any, idx int) bool {
+				return is.SameSlice(t, testCase.expectedLine[idx])
+			})
+			isGood := fn.Any(boolStatement, func(b bool) bool {
+				return b == true
+			})
+			if !isGood {
+				tt.Errorf("Expected %v, got %v", testCase.expectedLine, got)
 			}
 		})
 	}
