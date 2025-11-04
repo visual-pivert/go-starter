@@ -48,6 +48,10 @@ func (dataframe *Df) GetSeries(idx int) *series.Series {
 	return dataframe.data[idx]
 }
 
+func (dataframe *Df) GetAllSeries() []*series.Series {
+	return dataframe.data
+}
+
 func (dataframe *Df) GetSeriesByHeader(header string) *series.Series {
 	idx := fn.IndexOf(header, dataframe.columns)
 	return dataframe.data[idx]
@@ -60,6 +64,10 @@ func (dataframe *Df) GetValue(column int, row int) any {
 func (dataframe *Df) GetValueByHeader(column string, row int) any {
 	idx := fn.IndexOf(column, dataframe.columns)
 	return dataframe.data[idx].Get(row)
+}
+
+func (dataframe *Df) AddSeries(s *series.Series) *Df {
+	return NewDf(append(dataframe.data, s)...)
 }
 
 func (dataframe *Df) Shape() []int {
