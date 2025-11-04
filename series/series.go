@@ -54,6 +54,10 @@ func (s *Series) Get(i int) any {
 	return s.data[i]
 }
 
+func (s *Series) GetSlice() []any {
+	return s.data
+}
+
 func (s *Series) Set(i int, data any) *Series {
 	d := s.Copy()
 	d.data[i] = data
