@@ -1,6 +1,6 @@
 package fn
 
-func Any(slice []any, fn func(any) bool) bool {
+func Any[T any](slice []T, fn func(T) bool) bool {
 	for _, value := range slice {
 		if !fn(value) {
 			return false
