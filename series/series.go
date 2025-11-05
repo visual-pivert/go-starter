@@ -36,25 +36,45 @@ func ConvertData(data []any, t SeriesType) []any {
 	convertedData := make([]any, len(data))
 	for i, v := range data {
 		switch v.(type) {
-		case int, int8, int16, int32, int64, float64, float32, bool, time.Time:
-			return data
-		}
-		switch t {
-		case IntType:
-			convertedData[i], _ = strconv.Atoi(v.(string))
-		case FloatType:
-			convertedData[i], _ = strconv.ParseFloat(v.(string), 64)
-		case BoolType:
-			convertedData[i], _ = strconv.ParseBool(v.(string))
-		case TimeType:
-			for _, value := range dateFormats {
-				if _, err := time.Parse(value, v.(string)); err == nil {
-					convertedData[i] = v.(string)
-					break
-				}
+		case int, int8, int16, int32, int64:
+			if t == FloatType {
+				convertedData[i] = float64(v.(int))
+			} else {
+				convertedData[i] = v
 			}
-		case StringType:
-			convertedData[i] = v.(string)
+			continue
+		case float32, float64:
+			convertedData[i] = v
+			continue
+		case bool:
+			convertedData[i] = v
+			continue
+		case time.Time:
+			convertedData[i] = v
+			continue
+		case string:
+			switch t {
+			case IntType:
+				convertedData[i], _ = strconv.Atoi(v.(string))
+				continue
+			case FloatType:
+				convertedData[i], _ = strconv.ParseFloat(v.(string), 64)
+				continue
+			case BoolType:
+				convertedData[i], _ = strconv.ParseBool(v.(string))
+				continue
+			case TimeType:
+				for _, value := range dateFormats {
+					if _, err := time.Parse(value, v.(string)); err == nil {
+						convertedData[i] = v.(string)
+						break
+					}
+				}
+				continue
+			case StringType:
+				convertedData[i] = v.(string)
+				continue
+			}
 		}
 	}
 	return convertedData
