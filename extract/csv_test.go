@@ -15,6 +15,7 @@ func TestCsv(t *testing.T) {
 		expected [][]string
 	}{
 		{"simple csv", "name;weight;age\nJunior;55.5;18\nMino;150.12;25", ";", [][]string{{"name", "weight", "age"}, {"Junior", "55.5", "18"}, {"Mino", "150.12", "25"}}},
+		{"simple csv", "name;weight;age\nJunior;55.5;18\nMino;150.12;25\n", ";", [][]string{{"name", "weight", "age"}, {"Junior", "55.5", "18"}, {"Mino", "150.12", "25"}}},
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
