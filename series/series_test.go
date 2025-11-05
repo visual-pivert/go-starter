@@ -19,7 +19,7 @@ func TestSeries_Append(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
-			series := NewSeries(testCase.header, testCase.value, testCase.stype)
+			series := newSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.Append(4)
 			if is.SameSlice(got.data, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
@@ -44,7 +44,7 @@ func TestSeries_AppendSeries(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
-			series := NewSeries(testCase.header, testCase.value, testCase.stype)
+			series := newSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.AppendSlice([]any{4, 5})
 			if is.SameSlice(got.data, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
@@ -68,7 +68,7 @@ func TestSeries_Rename(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
-			series := NewSeries(testCase.header, []any{1, 2, 3}, testCase.stype)
+			series := newSeries(testCase.header, []any{1, 2, 3}, testCase.stype)
 			got := series.Rename(testCase.newHeader)
 			if (got.Name() == testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
@@ -91,7 +91,7 @@ func TestSeries_Set(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
-			series := NewSeries(testCase.header, testCase.value, testCase.stype)
+			series := newSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.Set(testCase.indexToSet, testCase.newValue)
 			if is.SameSlice(got.data, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
@@ -113,7 +113,7 @@ func TestSeries_Get(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
-			series := NewSeries(testCase.header, testCase.value, testCase.stype)
+			series := newSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.Get(testCase.indexToGet)
 			if got != testCase.expected {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
@@ -137,7 +137,7 @@ func TestSeries_FilerToBoolStatement(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
-			series := NewSeries(testCase.header, testCase.value, testCase.stype)
+			series := newSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.FilerToBoolStatement(testCase.fn)
 			if is.SameSlice(got, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
@@ -160,7 +160,7 @@ func TestSeries_IntersectWithBoolStatement(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			series := NewSeries(testCase.header, testCase.value, testCase.stype)
+			series := newSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.IntersectWithBoolStatement(testCase.boolStatement)
 			if is.SameSlice(got.data, testCase.expected) == false {
 				t.Errorf("Expected %v, got %v", testCase.expected, got)
@@ -186,7 +186,7 @@ func TestSeries_ApplyWithBoolStatement(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
-			series := NewSeries(testCase.header, testCase.value, testCase.stype)
+			series := newSeries(testCase.header, testCase.value, testCase.stype)
 			got := series.ApplyWithBoolStatement(testCase.boolStatement, testCase.fn)
 			if is.SameSlice(got.data, testCase.expected) == false {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)

@@ -1,6 +1,9 @@
 package series
 
 import (
+	"strconv"
+	"time"
+
 	visualfn "github.com/visual-pivert/go-starter/fn"
 )
 
@@ -21,7 +24,43 @@ type Series struct {
 	len   int
 }
 
-func NewSeries(name string, data []any, t SeriesType) *Series {
+func ConvertData(data []any, t SeriesType) []any {
+	dateFormats := []string{
+		time.RFC3339,
+		"2006-01-02",
+		"02/01/2006",
+		"2006/01/02",
+		"02-01-2006",
+		"2006-01-02 15:04:05",
+	}
+	convertedData := make([]any, len(data))
+	for i, v := range data {
+		switch v.(type) {
+		case int, int8, int16, int32, int64, float64, float32, bool, time.Time:
+			return data
+		}
+		switch t {
+		case IntType:
+			convertedData[i], _ = strconv.Atoi(v.(string))
+		case FloatType:
+			convertedData[i], _ = strconv.ParseFloat(v.(string), 64)
+		case BoolType:
+			convertedData[i], _ = strconv.ParseBool(v.(string))
+		case TimeType:
+			for _, value := range dateFormats {
+				if _, err := time.Parse(value, v.(string)); err == nil {
+					convertedData[i] = v.(string)
+					break
+				}
+			}
+		case StringType:
+			convertedData[i] = v.(string)
+		}
+	}
+	return convertedData
+}
+
+func newSeries(name string, data []any, t SeriesType) *Series {
 	return &Series{
 		name:  name,
 		data:  data,
@@ -30,8 +69,12 @@ func NewSeries(name string, data []any, t SeriesType) *Series {
 	}
 }
 
+func NewSeries(name string, data []any, t SeriesType) *Series {
+	return newSeries(name, ConvertData(data, t), t)
+}
+
 func (s *Series) Copy() *Series {
-	return NewSeries(s.name, s.data, s.stype)
+	return newSeries(s.name, s.data, s.stype)
 }
 
 func (s *Series) Len() int {
@@ -43,7 +86,7 @@ func (s *Series) Name() string {
 }
 
 func (s *Series) Rename(name string) *Series {
-	return NewSeries(name, s.data, s.stype)
+	return newSeries(name, s.data, s.stype)
 }
 
 func (s *Series) Type() SeriesType {
@@ -93,7 +136,7 @@ func (s *Series) ApplyWithBoolStatement(boolSlice []bool, fn func(any) any) *Ser
 }
 
 func (s *Series) IntersectWithBoolStatement(boolSlice []bool) *Series {
-	d := NewSeries(s.name, []any{}, s.stype)
+	d := newSeries(s.name, []any{}, s.stype)
 	for i, value := range s.data {
 		if boolSlice[i] {
 			d.data = append(d.data, value)
