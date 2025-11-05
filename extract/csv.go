@@ -25,5 +25,5 @@ func Csv(path string, sep string, headerIdx int) *df.Df {
 	}
 	fileStr := string(fileContent)
 	parsed := ParseCsv(fileStr, sep)
-	return ToDf(parsed, headerIdx)
+	return df.FromRaw(parsed, headerIdx)
 }

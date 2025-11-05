@@ -1,4 +1,4 @@
-package extract
+package df
 
 import (
 	"reflect"
@@ -6,24 +6,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/visual-pivert/go-starter/df"
 	"github.com/visual-pivert/go-starter/series"
 )
 
-func ToDf(raw [][]string, headerIdx int) *df.Df {
+func FromRaw(raw [][]string, headerIdx int) *Df {
 	headers := raw[headerIdx]
-	out := df.New()
+	out := New()
 	for i := 0; i < len(headers); i++ {
 		var arr []any
 		for j := headerIdx + 1; j < len(raw); j++ {
 			arr = append(arr, raw[j][i])
 		}
-		out = out.AddSeries(series.New(headers[i], arr, GetSliceType(arr)))
+		out = out.AddSeries(series.New(headers[i], arr, getRawSliceType(arr)))
 	}
 	return out
 }
 
-func GetSliceType(slice []any) series.Type {
+func getRawSliceType(slice []any) series.Type {
 	dateFormats := []string{
 		time.RFC3339,
 		"2006-01-02",

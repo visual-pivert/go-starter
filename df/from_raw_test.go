@@ -1,4 +1,4 @@
-package extract
+package df
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	"github.com/visual-pivert/go-starter/series"
 )
 
-func TestToDf(t *testing.T) {
+func TestFromRaw(t *testing.T) {
 	testCases := []struct {
 		name            string
 		value           [][]string
@@ -21,7 +21,7 @@ func TestToDf(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
-			got := ToDf(testCase.value, 0)
+			got := FromRaw(testCase.value, 0)
 			gotHeaders := got.Columns()
 			gotTypes := fn.Map(got.GetAllSeries(), func(t *series.Series, idx int) series.Type {
 				return t.Type()
