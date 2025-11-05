@@ -18,7 +18,7 @@ func ToDf(raw [][]string, headerIdx int) *df.Df {
 		for j := headerIdx + 1; j < len(raw); j++ {
 			arr = append(arr, raw[j][i])
 		}
-		out = out.AddSeries(series.NewSeries(headers[i], arr, GetSliceType(arr)))
+		out = out.AddSeries(series.New(headers[i], arr, GetSliceType(arr)))
 	}
 	return out
 }

@@ -10,11 +10,11 @@ import (
 
 func createDf() *Df {
 	dataframe := NewDf(
-		series.NewSeries("str", []any{"a", "b", "c"}, series.StringType),
-		series.NewSeries("int", []any{1, 2, 3}, series.IntType),
-		series.NewSeries("float", []any{1.1, 2.2, 3.3}, series.FloatType),
-		series.NewSeries("bool", []any{true, false, true}, series.BoolType),
-		series.NewSeries("time", []any{"2025/10/04", "2025/11/11", "2025/12/07"}, series.TimeType),
+		series.New("str", []any{"a", "b", "c"}, series.StringType),
+		series.New("int", []any{1, 2, 3}, series.IntType),
+		series.New("float", []any{1.1, 2.2, 3.3}, series.FloatType),
+		series.New("bool", []any{true, false, true}, series.BoolType),
+		series.New("time", []any{"2025/10/04", "2025/11/11", "2025/12/07"}, series.TimeType),
 	)
 	return dataframe
 }

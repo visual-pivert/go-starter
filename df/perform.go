@@ -5,7 +5,7 @@ import (
 )
 
 func Perform(dataframe *Df, s *series.Series, fun func(d *Df, prev any, index int) any) *series.Series {
-	newSeries := series.NewSeries(s.Name(), []any{}, s.Type())
+	newSeries := series.New(s.Name(), []any{}, s.Type())
 	shape := dataframe.Shape()
 	nbLine := shape[0]
 	var prev any

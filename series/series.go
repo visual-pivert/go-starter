@@ -89,7 +89,7 @@ func newSeries(name string, data []any, t SeriesType) *Series {
 	}
 }
 
-func NewSeries(name string, data []any, t SeriesType) *Series {
+func New(name string, data []any, t SeriesType) *Series {
 	return newSeries(name, ConvertData(data, t), t)
 }
 
