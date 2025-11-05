@@ -18,7 +18,7 @@ func TestSeries_Aggregate(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
 			s := newSeries("number", testCase.value, IntType)
-			got := Aggregate(s, testCase.initialValue, testCase.fn)
+			got := Agg(s, testCase.initialValue, testCase.fn)
 			if got != testCase.expected {
 				tt.Errorf("Expected %v, got %v", testCase.expected, got)
 			}
