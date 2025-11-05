@@ -9,7 +9,7 @@ import (
 )
 
 func createDf() *Df {
-	dataframe := NewDf(
+	dataframe := New(
 		series.New("str", []any{"a", "b", "c"}, series.StringType),
 		series.New("int", []any{1, 2, 3}, series.IntType),
 		series.New("float", []any{1.1, 2.2, 3.3}, series.FloatType),

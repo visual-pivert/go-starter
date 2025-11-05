@@ -12,7 +12,7 @@ import (
 
 func ToDf(raw [][]string, headerIdx int) *df.Df {
 	headers := raw[headerIdx]
-	out := df.NewDf()
+	out := df.New()
 	for i := 0; i < len(headers); i++ {
 		var arr []any
 		for j := headerIdx + 1; j < len(raw); j++ {

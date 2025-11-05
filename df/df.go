@@ -38,7 +38,7 @@ func calculateShape(data []*series.Series) []int {
 	return out
 }
 
-func NewDf(data ...*series.Series) *Df {
+func New(data ...*series.Series) *Df {
 	return &Df{data, calculateColumns(data), calculateShape(data)}
 }
 
@@ -86,7 +86,7 @@ func (dataframe *Df) GetValueByHeader(column string, row int) any {
 }
 
 func (dataframe *Df) AddSeries(s *series.Series) *Df {
-	return NewDf(append(dataframe.data, s)...)
+	return New(append(dataframe.data, s)...)
 }
 
 func (dataframe *Df) Shape() []int {
@@ -101,7 +101,7 @@ func (dataframe *Df) RemoveColumns(indexes ...int) *Df {
 			newSeries = append(newSeries, d)
 		}
 	}
-	return NewDf(newSeries...)
+	return New(newSeries...)
 }
 
 func (dataframe *Df) RemoveColumnsByHeader(names ...string) *Df {
@@ -112,7 +112,7 @@ func (dataframe *Df) RemoveColumnsByHeader(names ...string) *Df {
 			newSeries = append(newSeries, d)
 		}
 	}
-	return NewDf(newSeries...)
+	return New(newSeries...)
 }
 
 func (dataframe *Df) GetLine(idx int) []any {
@@ -136,7 +136,7 @@ func (dataframe *Df) IntersectWithBoolStatement(boolSlice []bool) *Df {
 	for _, d := range dataframe.data {
 		s = append(s, d.IntersectWithBoolStatement(boolSlice))
 	}
-	return NewDf(s...)
+	return New(s...)
 }
 
 func (dataframe *Df) ToMdString() string {
