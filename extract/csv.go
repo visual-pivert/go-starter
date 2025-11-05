@@ -1,7 +1,10 @@
 package extract
 
 import (
+	"os"
 	"strings"
+
+	"github.com/visual-pivert/go-starter/df"
 )
 
 func ParseCsv(content string, sep string) [][]string {
