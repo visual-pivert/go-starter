@@ -23,10 +23,10 @@ func TestDf_Types(t *testing.T) {
 	testCases := []struct {
 		name           string
 		df             *Df
-		expected       []series.SeriesType
+		expected       []series.Type
 		expectedString []string
 	}{
-		{"types", createDf(), []series.SeriesType{series.StringType, series.IntType, series.FloatType, series.BoolType, series.TimeType}, []string{"string", "int", "float", "bool", "time"}},
+		{"types", createDf(), []series.Type{series.StringType, series.IntType, series.FloatType, series.BoolType, series.TimeType}, []string{"string", "int", "float", "bool", "time"}},
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {

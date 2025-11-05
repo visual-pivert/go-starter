@@ -10,7 +10,7 @@ func TestSeries_Append(t *testing.T) {
 	testCases := []struct {
 		name        string
 		header      string
-		stype       SeriesType
+		stype       Type
 		value       []any
 		expected    []any
 		expectedLen int
@@ -35,7 +35,7 @@ func TestSeries_AppendSeries(t *testing.T) {
 	testCases := []struct {
 		name        string
 		header      string
-		stype       SeriesType
+		stype       Type
 		value       []any
 		expected    []any
 		expectedLen int
@@ -60,7 +60,7 @@ func TestSeries_Rename(t *testing.T) {
 	testCases := []struct {
 		name      string
 		header    string
-		stype     SeriesType
+		stype     Type
 		newHeader string
 		expected  string
 	}{
@@ -81,7 +81,7 @@ func TestSeries_Set(t *testing.T) {
 	testCases := []struct {
 		name       string
 		header     string
-		stype      SeriesType
+		stype      Type
 		value      []any
 		indexToSet int
 		newValue   any
@@ -104,7 +104,7 @@ func TestSeries_Get(t *testing.T) {
 	testCases := []struct {
 		name       string
 		header     string
-		stype      SeriesType
+		stype      Type
 		value      []any
 		indexToGet int
 		expected   any
@@ -126,7 +126,7 @@ func TestSeries_FilerToBoolStatement(t *testing.T) {
 	testCases := []struct {
 		name     string
 		header   string
-		stype    SeriesType
+		stype    Type
 		fn       func(any) bool
 		value    []any
 		expected []bool
@@ -150,7 +150,7 @@ func TestSeries_IntersectWithBoolStatement(t *testing.T) {
 	testCases := []struct {
 		name          string
 		header        string
-		stype         SeriesType
+		stype         Type
 		value         []any
 		boolStatement []bool
 		expected      []any
@@ -176,7 +176,7 @@ func TestSeries_ApplyWithBoolStatement(t *testing.T) {
 	testCases := []struct {
 		name          string
 		header        string
-		stype         SeriesType
+		stype         Type
 		value         []any
 		fn            func(any) any
 		boolStatement []bool

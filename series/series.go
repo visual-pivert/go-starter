@@ -7,24 +7,24 @@ import (
 	visualfn "github.com/visual-pivert/go-starter/fn"
 )
 
-type SeriesType string
+type Type string
 
 const (
-	IntType    SeriesType = "int"
-	FloatType             = "float"
-	StringType            = "string"
-	BoolType              = "bool"
-	TimeType              = "time"
+	IntType    Type = "int"
+	FloatType       = "float"
+	StringType      = "string"
+	BoolType        = "bool"
+	TimeType        = "time"
 )
 
 type Series struct {
 	name  string
 	data  []any
-	stype SeriesType
+	stype Type
 	len   int
 }
 
-func ConvertData(data []any, t SeriesType) []any {
+func ConvertData(data []any, t Type) []any {
 	dateFormats := []string{
 		time.RFC3339,
 		"2006-01-02",
@@ -80,7 +80,7 @@ func ConvertData(data []any, t SeriesType) []any {
 	return convertedData
 }
 
-func newSeries(name string, data []any, t SeriesType) *Series {
+func newSeries(name string, data []any, t Type) *Series {
 	return &Series{
 		name:  name,
 		data:  data,
@@ -89,7 +89,7 @@ func newSeries(name string, data []any, t SeriesType) *Series {
 	}
 }
 
-func New(name string, data []any, t SeriesType) *Series {
+func New(name string, data []any, t Type) *Series {
 	return newSeries(name, ConvertData(data, t), t)
 }
 
@@ -109,7 +109,7 @@ func (s *Series) Rename(name string) *Series {
 	return newSeries(name, s.data, s.stype)
 }
 
-func (s *Series) Type() SeriesType {
+func (s *Series) Type() Type {
 	return s.stype
 }
 

@@ -46,8 +46,8 @@ func (dataframe *Df) Columns() []string {
 	return dataframe.columns
 }
 
-func (dataframe *Df) Types() []series.SeriesType {
-	var out []series.SeriesType
+func (dataframe *Df) Types() []series.Type {
+	var out []series.Type
 	for _, s := range dataframe.data {
 		out = append(out, s.Type())
 	}

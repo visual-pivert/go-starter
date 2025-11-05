@@ -23,7 +23,7 @@ func ToDf(raw [][]string, headerIdx int) *df.Df {
 	return out
 }
 
-func GetSliceType(slice []any) series.SeriesType {
+func GetSliceType(slice []any) series.Type {
 	dateFormats := []string{
 		time.RFC3339,
 		"2006-01-02",
