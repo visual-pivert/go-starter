@@ -19,7 +19,7 @@ func TestCsv(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {
-			got := ParseCsv(testCase.value, testCase.sep)
+			got := parseCsv(testCase.value, testCase.sep)
 			checkingSlice := fn.Map(got, func(t []string, idx int) any {
 				return is.SameSlice(t, testCase.expected[idx])
 			})

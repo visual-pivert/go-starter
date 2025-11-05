@@ -8,7 +8,7 @@ import (
 	"github.com/visual-pivert/go-starter/fn"
 )
 
-func ParseCsv(content string, sep string) [][]string {
+func parseCsv(content string, sep string) [][]string {
 	split := strings.Split(content, "\n")
 	split = fn.FilterTruthy(split)
 	var out [][]string
@@ -24,6 +24,6 @@ func Csv(path string, sep string, headerIdx int) *df.Df {
 		panic(err)
 	}
 	fileStr := string(fileContent)
-	parsed := ParseCsv(fileStr, sep)
+	parsed := parseCsv(fileStr, sep)
 	return df.FromRaw(parsed, headerIdx)
 }
