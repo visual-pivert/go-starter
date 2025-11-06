@@ -6,7 +6,7 @@ import (
 	"github.com/visual-pivert/go-starter/is"
 )
 
-func TestMap(t *testing.T) {
+func TestFn_Map(t *testing.T) {
 	useCases := []struct {
 		name     string
 		value    []any
@@ -27,7 +27,7 @@ func TestMap(t *testing.T) {
 	}
 }
 
-func TestMapReverse(t *testing.T) {
+func TestFn_MapReverse(t *testing.T) {
 	useCases := []struct {
 		name     string
 		value    []any

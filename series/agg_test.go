@@ -2,7 +2,7 @@ package series
 
 import "testing"
 
-func TestSeries_Aggregate(t *testing.T) {
+func TestSeries_Agg(t *testing.T) {
 	testCases := []struct {
 		name         string
 		initialValue any

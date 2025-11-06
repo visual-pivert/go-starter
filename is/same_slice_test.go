@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestSameSlice(t *testing.T) {
+func TestIs_SameSlice(t *testing.T) {
 	useCases := []struct {
 		name     string
 		value1   []any

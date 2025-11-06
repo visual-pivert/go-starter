@@ -2,7 +2,7 @@ package is
 
 import "testing"
 
-func TestIsFalsy(t *testing.T) {
+func TestIs_Falsy(t *testing.T) {
 	testCases := []struct {
 		name     string
 		value    any

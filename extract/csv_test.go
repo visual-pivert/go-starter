@@ -7,7 +7,7 @@ import (
 	"github.com/visual-pivert/go-starter/is"
 )
 
-func TestCsv(t *testing.T) {
+func TestExtract_Csv(t *testing.T) {
 	testCases := []struct {
 		name     string
 		value    string

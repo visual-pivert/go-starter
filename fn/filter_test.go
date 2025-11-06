@@ -6,7 +6,7 @@ import (
 	"github.com/visual-pivert/go-starter/is"
 )
 
-func TestFilter(t *testing.T) {
+func TestFn_Filter(t *testing.T) {
 	testCases := []struct {
 		name     string
 		value    []any
@@ -31,7 +31,7 @@ func TestFilter(t *testing.T) {
 	}
 }
 
-func TestFilterI(t *testing.T) {
+func TestFn_FilterI(t *testing.T) {
 	testCases := []struct {
 		name     string
 		value    []any
@@ -56,7 +56,7 @@ func TestFilterI(t *testing.T) {
 	}
 }
 
-func TestFilterTruthy(t *testing.T) {
+func TestFn_FilterTruthy(t *testing.T) {
 	testCases := []struct {
 		name     string
 		value    []any
@@ -74,7 +74,7 @@ func TestFilterTruthy(t *testing.T) {
 	}
 }
 
-func TestFilterITruthy(t *testing.T) {
+func TestFn_FilterITruthy(t *testing.T) {
 	testCases := []struct {
 		name     string
 		value    []any
@@ -92,7 +92,7 @@ func TestFilterITruthy(t *testing.T) {
 	}
 }
 
-func TestFilterToBoolStatement(t *testing.T) {
+func TestFn_FilterToBoolStatement(t *testing.T) {
 	testCases := []struct {
 		name     string
 		value    []any

@@ -8,7 +8,7 @@ import (
 	"github.com/visual-pivert/go-starter/series"
 )
 
-func TestFromRaw(t *testing.T) {
+func TestDf_FromRaw(t *testing.T) {
 	testCases := []struct {
 		name            string
 		value           [][]string
@@ -16,8 +16,8 @@ func TestFromRaw(t *testing.T) {
 		expectedTypes   []series.Type
 		expectedLen     int
 	}{
-		{"to df", [][]string{{"letters", "numbers"}, {"a", "1"}, {"b", "2"}, {"c", "3"}}, []string{"letters", "numbers"}, []series.Type{series.StringType, series.IntType}, 2},
-		{"to df 2", [][]string{{"times", "numbers"}, {"2025/10/01", "1"}, {"2024/10/10", "2"}, {"2025/11/12", "3"}}, []string{"times", "numbers"}, []series.Type{series.TimeType, series.IntType}, 2},
+		{"from raw", [][]string{{"letters", "numbers"}, {"a", "1"}, {"b", "2"}, {"c", "3"}}, []string{"letters", "numbers"}, []series.Type{series.StringType, series.IntType}, 2},
+		{"from raw2", [][]string{{"times", "numbers"}, {"2025/10/01", "1"}, {"2024/10/10", "2"}, {"2025/11/12", "3"}}, []string{"times", "numbers"}, []series.Type{series.TimeType, series.IntType}, 2},
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(tt *testing.T) {

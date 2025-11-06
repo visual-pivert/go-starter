@@ -6,7 +6,7 @@ import (
 	"github.com/visual-pivert/go-starter/is"
 )
 
-func TestReduce(t *testing.T) {
+func TestFn_Reduce(t *testing.T) {
 	testCases := []struct {
 		name         string
 		initialValue any

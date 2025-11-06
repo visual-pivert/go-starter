@@ -2,7 +2,7 @@ package fn
 
 import "testing"
 
-func TestAny(t *testing.T) {
+func TestFn_Any(t *testing.T) {
 	testCases := []struct {
 		name     string
 		value    []any

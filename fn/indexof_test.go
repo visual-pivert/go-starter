@@ -2,7 +2,7 @@ package fn
 
 import "testing"
 
-func TestIndexOf(t *testing.T) {
+func TestFn_IndexOf(t *testing.T) {
 	testCases := []struct {
 		name     string
 		value    []any
