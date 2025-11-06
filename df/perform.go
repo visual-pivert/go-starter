@@ -4,8 +4,7 @@ import (
 	"github.com/visual-pivert/go-starter/series"
 )
 
-// Perform TODO: Search better name
-func Perform(dataframe *Df, s *series.Series, fun func(d *Df, prev any, index int) any) *series.Series {
+func Compute(dataframe *Df, s *series.Series, fun func(d *Df, prev any, index int) any) *series.Series {
 	newSeries := series.New(s.Name(), []any{}, s.Type())
 	shape := dataframe.Shape()
 	nbLine := shape[0]

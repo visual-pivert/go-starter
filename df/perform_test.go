@@ -22,7 +22,7 @@ func TestDf_Perform(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(tt *testing.T) {
 			newSeries := series.New("result", []any{}, series.FloatType)
-			got := Perform(tc.df, newSeries, tc.fn)
+			got := Compute(tc.df, newSeries, tc.fn)
 			if !is.SameSlice(tc.expected, got.GetSlice()) {
 				tt.Errorf("Expected %v, got %v", tc.expected, got.GetSlice())
 			}
