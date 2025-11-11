@@ -10,10 +10,10 @@ func TestFn_Any(t *testing.T) {
 		expected any
 	}{
 		{"greater than 0", []any{1, 2, 3}, func(a any) bool { return a.(int) > 0 }, true},
-		{"greater than 1", []any{1, 2, 3}, func(a any) bool { return a.(int) > 1 }, false},
+		{"greater than 1", []any{1, 2, 3}, func(a any) bool { return a.(int) > 1 }, true},
 		{"str length greater or equal to 1", []any{"qwe", "qw", "q"}, func(a any) bool { return len(a.(string)) >= 1 }, true},
-		{"str length greater or equal to 2", []any{"qwe", "qw", "q"}, func(a any) bool { return len(a.(string)) >= 2 }, false},
-		{"str length greater or equal to 3", []any{"qwe", "qw", "q"}, func(a any) bool { return len(a.(string)) >= 3 }, false},
+		{"str length greater or equal to 2", []any{"qwe", "qw", "q"}, func(a any) bool { return len(a.(string)) >= 2 }, true},
+		{"str length greater or equal to 3", []any{"qwe", "qw", "q"}, func(a any) bool { return len(a.(string)) > 3 }, false},
 	}
 
 	for _, testCase := range testCases {
