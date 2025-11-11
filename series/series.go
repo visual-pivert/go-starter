@@ -1,167 +1,132 @@
 package series
 
 import (
-	"strconv"
-	"time"
+	"fmt"
 
-	visualfn "github.com/visual-pivert/go-starter/fn"
+	fnVisual "github.com/visual-pivert/go-starter/fn"
 )
 
-type Type string
-
-const (
-	IntType    Type = "int"
-	FloatType       = "float"
-	StringType      = "string"
-	BoolType        = "bool"
-	TimeType        = "time"
-)
-
-type Series struct {
-	name  string
-	data  []any
-	stype Type
-	len   int
+type Series[T comparable] struct {
+	data []T
 }
 
-func ConvertData(data []any, t Type) []any {
-	dateFormats := []string{
-		time.RFC3339,
-		"2006-01-02",
-		"02/01/2006",
-		"2006/01/02",
-		"02-01-2006",
-		"2006-01-02 15:04:05",
-	}
-	convertedData := make([]any, len(data))
-	for i, v := range data {
-		switch v.(type) {
-		case int, int8, int16, int32, int64:
-			if t == FloatType {
-				convertedData[i] = float64(v.(int))
-			} else {
-				convertedData[i] = v
-			}
-			continue
-		case float32, float64:
-			convertedData[i] = v
-			continue
-		case bool:
-			convertedData[i] = v
-			continue
-		case time.Time:
-			convertedData[i] = v
-			continue
-		case string:
-			switch t {
-			case IntType:
-				convertedData[i], _ = strconv.Atoi(v.(string))
-				continue
-			case FloatType:
-				convertedData[i], _ = strconv.ParseFloat(v.(string), 64)
-				continue
-			case BoolType:
-				convertedData[i], _ = strconv.ParseBool(v.(string))
-				continue
-			case TimeType:
-				for _, value := range dateFormats {
-					if _, err := time.Parse(value, v.(string)); err == nil {
-						convertedData[i] = v.(string)
-						break
-					}
-				}
-				continue
-			case StringType:
-				convertedData[i] = v.(string)
-				continue
-			}
-		}
-	}
-	return convertedData
+func New[T comparable](data []T) Series[T] {
+	return Series[T]{data}
 }
 
-func newSeries(name string, data []any, t Type) *Series {
-	return &Series{
-		name:  name,
-		data:  data,
-		stype: t,
-		len:   len(data),
-	}
+func (s Series[T]) Append(values []T) Series[T] {
+	out := make([]T, 0, len(s.data)+len(values))
+	out = append(out, s.data...)
+	out = append(out, values...)
+	return Series[T]{out}
 }
 
-func New(name string, data []any, t Type) *Series {
-	return newSeries(name, ConvertData(data, t), t)
+func (s Series[T]) AppendTo(pos int, values []T) Series[T] {
+	out := make([]T, 0, len(s.data)+len(values))
+	out = append(out, s.data[:pos]...)
+	out = append(out, values...)
+	out = append(out, s.data[pos:]...)
+	return Series[T]{out}
 }
 
-func (s *Series) Copy() *Series {
-	return newSeries(s.name, s.data, s.stype)
+func (s Series[T]) Pop() (Series[T], T) {
+	out := make([]T, 0, len(s.data)-1)
+	out = append(out, s.data[:len(s.data)-1]...)
+	return Series[T]{out}, s.data[len(s.data)-1]
 }
 
-func (s *Series) Len() int {
-	return s.len
+func (s Series[T]) Shift() (Series[T], T) {
+	out := make([]T, 0, len(s.data)-1)
+	out = append(out, s.data[1:]...)
+	return Series[T]{out}, s.data[0]
 }
 
-func (s *Series) Name() string {
-	return s.name
+func (s Series[T]) Remove(index int) Series[T] {
+	out := make([]T, 0, len(s.data)-1)
+	out = append(out, s.data[:index]...)
+	out = append(out, s.data[index+1:]...)
+	return Series[T]{out}
 }
 
-func (s *Series) Rename(name string) *Series {
-	return newSeries(name, s.data, s.stype)
+func (s Series[T]) Range(start int, nbr int) Series[T] {
+	out := make([]T, 0, nbr)
+	out = append(out, s.data[start:start+nbr]...)
+	return Series[T]{out}
 }
 
-func (s *Series) Type() Type {
-	return s.stype
+func (s Series[T]) Len() int {
+	return len(s.data)
 }
 
-func (s *Series) Get(i int) any {
-	return s.data[i]
+func (s Series[T]) Count() int {
+	return len(s.data)
 }
 
-func (s *Series) GetSlice() []any {
-	return s.data
+func (s Series[T]) Debug() {
+	fmt.Println(s.data)
 }
 
-func (s *Series) Set(i int, data any) *Series {
-	d := s.Copy()
-	d.data[i] = data
-	return d
+func (s Series[T]) ToSlice() []T {
+	var out []T
+	out = append(out, s.data...)
+	return out
 }
 
-func (s *Series) Append(data any) *Series {
-	d := s.Copy()
-	d.data = append(s.data, data)
-	d.len++
-	return d
+func (s Series[T]) Filter(fn func(value T) bool) Series[T] {
+	out := fnVisual.Filter(s.data, fn)
+	return Series[T]{out}
 }
 
-func (s *Series) AppendSlice(data []any) *Series {
-	d := s.Copy()
-	d.data = append(s.data, data...)
-	d.len += len(data)
-	return d
+func (s Series[T]) FilterI(fn func(value T) bool) Series[int] {
+	out := fnVisual.FilterI(s.data, fn)
+	return Series[int]{out}
 }
 
-func (s *Series) FilerToBoolStatement(fn func(any) bool) []bool {
-	return visualfn.FilterToBoolStatement(s.data, fn)
+func (s Series[T]) Reduce(initialValue T, fn func(last T, curr T, currIndex int) T) Series[T] {
+	out := fnVisual.Reduce(s.data, initialValue, fn)
+	return Series[T]{out}
 }
 
-func (s *Series) ApplyWithBoolStatement(boolSlice []bool, fn func(any) any) *Series {
-	d := s.Copy()
-	for i, value := range d.data {
-		if boolSlice[i] {
-			d.data[i] = fn(value)
-		}
-	}
-	return d
+func (s Series[T]) Map(fn func(value T, index int) T) Series[T] {
+	out := fnVisual.Map(s.data, fn)
+	return Series[T]{out}
 }
 
-func (s *Series) IntersectWithBoolStatement(boolSlice []bool) *Series {
-	d := newSeries(s.name, []any{}, s.stype)
-	for i, value := range s.data {
-		if boolSlice[i] {
-			d.data = append(d.data, value)
-		}
-	}
-	d.len = len(d.data)
-	return d
+func (s Series[T]) MapToBool(fn func(value T, index int) bool) Series[bool] {
+	out := fnVisual.Map(s.data, fn)
+	return Series[bool]{out}
+}
+
+func (s Series[T]) GetValue(index int) T {
+	return s.data[index]
+}
+
+func (s Series[T]) SetValue(index int, value T) Series[T] {
+	s.data[index] = value
+	return Series[T]{s.data}
+}
+
+func (s Series[T]) Reverse() Series[T] {
+	out := fnVisual.Reverse(s.data)
+	return Series[T]{out}
+}
+
+func (s Series[T]) Agg(initialValue T, fn func(last T, curr T, currIndex int) T) T {
+	out := fnVisual.Reduce(s.data, initialValue, fn)
+	return out[len(out)-1]
+}
+
+func (s Series[T]) Any(fn func(value T) bool) bool {
+	out := fnVisual.Any(s.data, fn)
+	return out
+}
+
+func (s Series[T]) All(fn func(value T) bool) bool {
+	out := fnVisual.All(s.data, fn)
+	return out
+}
+
+func (s Series[T]) IndexOf(value T) int {
+	out := fnVisual.IndexOf(value, s.data)
+	return out
 }

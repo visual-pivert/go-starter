@@ -8,93 +8,171 @@ import (
 
 func TestSeries_Append(t *testing.T) {
 	testCases := []struct {
-		name        string
-		header      string
-		stype       Type
-		value       []any
-		expected    []any
-		expectedLen int
+		name     string
+		value    []int
+		append   []int
+		expected []int
+		lenExp   int
 	}{
-		{"append int value to int series", "number", IntType, []any{1, 2, 3}, []any{1, 2, 3, 4}, 4},
+		{"append single", []int{1, 2, 3}, []int{4}, []int{1, 2, 3, 4}, 4},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			series := newSeries(testCase.header, testCase.value, testCase.stype)
-			got := series.Append(4)
-			if is.SameSlice(got.data, testCase.expected) == false {
-				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.Append(tc.append)
+			if !is.SameSlice(got.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, got.ToSlice())
 			}
-			if got.Len() != testCase.expectedLen {
-				tt.Errorf("Expected %v, got %v", testCase.expectedLen, got.Len())
+			if got.Len() != tc.lenExp {
+				tt.Errorf("Expected %v, got %v", tc.lenExp, got.Len())
 			}
 		})
 	}
 }
 
-func TestSeries_AppendSeries(t *testing.T) {
+func TestSeries_AppendTo(t *testing.T) {
 	testCases := []struct {
-		name        string
-		header      string
-		stype       Type
-		value       []any
-		expected    []any
-		expectedLen int
+		name     string
+		value    []string
+		pos      int
+		append   []string
+		expected []string
 	}{
-		{"append int slice to int series", "number", IntType, []any{1, 2, 3}, []any{1, 2, 3, 4, 5}, 5},
+		{"insert in middle", []string{"a", "c"}, 1, []string{"b"}, []string{"a", "b", "c"}},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			series := newSeries(testCase.header, testCase.value, testCase.stype)
-			got := series.AppendSlice([]any{4, 5})
-			if is.SameSlice(got.data, testCase.expected) == false {
-				tt.Errorf("Expected %v, got %v", testCase.expected, got)
-			}
-			if got.Len() != testCase.expectedLen {
-				tt.Errorf("Expected %v, got %v", testCase.expectedLen, got.Len())
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.AppendTo(tc.pos, tc.append)
+			if !is.SameSlice(got.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, got.ToSlice())
 			}
 		})
 	}
 }
 
-func TestSeries_Rename(t *testing.T) {
+func TestSeries_Pop(t *testing.T) {
+	// pop
 	testCases := []struct {
-		name      string
-		header    string
-		stype     Type
-		newHeader string
-		expected  string
+		name     string
+		value    []int
+		expected []int
+		last     int
 	}{
-		{"rename series", "number", IntType, "new_number", "new_number"},
+		{"pop last", []int{1, 2, 3}, []int{1, 2}, 3},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			series := newSeries(testCase.header, []any{1, 2, 3}, testCase.stype)
-			got := series.Rename(testCase.newHeader)
-			if (got.Name() == testCase.expected) == false {
-				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			after, last := s.Pop()
+			if last != tc.last {
+				tt.Errorf("Expected %v, got %v", tc.last, last)
+			}
+			if !is.SameSlice(after.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, after.ToSlice())
 			}
 		})
 	}
 }
 
-func TestSeries_Set(t *testing.T) {
+func TestSeries_Shift(t *testing.T) {
 	testCases := []struct {
-		name       string
-		header     string
-		stype      Type
-		value      []any
-		indexToSet int
-		newValue   any
-		expected   []any
+		name     string
+		value    []int
+		expected []int
+		first    int
 	}{
-		{"set value to series", "number", IntType, []any{1, 2, 3}, 1, 4, []any{1, 4, 3}},
+		{"shift first", []int{1, 2, 3}, []int{2, 3}, 1},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			series := newSeries(testCase.header, testCase.value, testCase.stype)
-			got := series.Set(testCase.indexToSet, testCase.newValue)
-			if is.SameSlice(got.data, testCase.expected) == false {
-				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			after, first := s.Shift()
+			if first != tc.first {
+				tt.Errorf("Expected %v, got %v", tc.first, first)
+			}
+			if !is.SameSlice(after.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, after.ToSlice())
+			}
+		})
+	}
+}
+
+func TestSeries_Remove(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []int
+		index    int
+		expected []int
+	}{
+		{"remove index 1", []int{1, 2, 3, 4}, 1, []int{1, 3, 4}},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.Remove(tc.index)
+			if !is.SameSlice(got.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, got.ToSlice())
+			}
+		})
+	}
+}
+
+func TestSeries_Range(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []int
+		start    int
+		nbr      int
+		expected []int
+	}{
+		{"slice middle", []int{1, 2, 3, 4}, 1, 2, []int{2, 3}},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.Range(tc.start, tc.nbr)
+			if !is.SameSlice(got.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, got.ToSlice())
+			}
+		})
+	}
+}
+
+func TestSeries_Len_Count(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []int
+		lenExp   int
+		countExp int
+		sliceExp []int
+	}{
+		{"length", []int{10, 20, 30}, 3, 3, []int{10, 20, 30}},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			if s.Len() != tc.lenExp || s.Count() != tc.countExp {
+				tt.Errorf("Expected length %d, got %d/%d", tc.lenExp, s.Len(), s.Count())
+			}
+		})
+	}
+}
+func TestSeries_ToSlice(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []int
+		lenExp   int
+		countExp int
+		sliceExp []int
+	}{
+		{"slice", []int{10, 20, 30}, 3, 3, []int{10, 20, 30}},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			if !is.SameSlice(s.ToSlice(), tc.sliceExp) {
+				tt.Errorf("Expected %v, got %v", tc.sliceExp, s.ToSlice())
 			}
 		})
 	}
@@ -102,94 +180,243 @@ func TestSeries_Set(t *testing.T) {
 
 func TestSeries_Get(t *testing.T) {
 	testCases := []struct {
-		name       string
-		header     string
-		stype      Type
-		value      []any
-		indexToGet int
-		expected   any
+		name     string
+		value    []int
+		index    int
+		expected int
 	}{
-		{"get value from series", "number", IntType, []any{1, 2, 3}, 1, 2},
+		{"get index 1", []int{1, 2, 3}, 1, 2},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			series := newSeries(testCase.header, testCase.value, testCase.stype)
-			got := series.Get(testCase.indexToGet)
-			if got != testCase.expected {
-				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.GetValue(tc.index)
+			if got != tc.expected {
+				tt.Errorf("Expected %v, got %v", tc.expected, got)
 			}
 		})
 	}
 }
 
-func TestSeries_FilerToBoolStatement(t *testing.T) {
+func TestSeries_Set(t *testing.T) {
 	testCases := []struct {
 		name     string
-		header   string
-		stype    Type
-		fn       func(any) bool
-		value    []any
+		value    []int
+		index    int
+		newValue int
+		expected []int
+	}{
+		{"set index 1", []int{1, 2, 3}, 1, 42, []int{1, 42, 3}},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.SetValue(tc.index, tc.newValue)
+			if !is.SameSlice(got.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, got.ToSlice())
+			}
+		})
+	}
+}
+
+func TestSeries_Filter(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []int
+		fn       func(int) bool
+		expected []int
+	}{
+		{"even values", []int{1, 2, 3, 4, 5}, func(v int) bool { return v%2 == 0 }, []int{2, 4}},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.Filter(tc.fn)
+			if !is.SameSlice(got.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, got.ToSlice())
+			}
+		})
+	}
+}
+
+func TestSeries_FilterI(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []int
+		fn       func(int) bool
+		expected []int
+	}{
+		{"even indices", []int{1, 2, 3, 4, 5}, func(v int) bool { return v%2 == 0 }, []int{1, 3}},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			idx := s.FilterI(tc.fn)
+			if !is.SameSlice(idx.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, idx.ToSlice())
+			}
+		})
+	}
+}
+
+func TestSeries_Map(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []int
+		fn       func(int, int) int
+		expected []int
+	}{
+		{"double", []int{1, 2, 3}, func(v int, i int) int { return v * 2 }, []int{2, 4, 6}},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.Map(tc.fn)
+			if !is.SameSlice(got.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, got.ToSlice())
+			}
+		})
+	}
+}
+
+func TestSeries_MapToBool(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []int
+		fn       func(int, int) bool
 		expected []bool
 	}{
-		{"filter even number to bool statement", "header", IntType, func(value any) bool { return value.(int)%2 == 0 }, []any{1, 2, 3}, []bool{false, true, false}},
-		{"filter odd number to bool statement", "header", IntType, func(value any) bool { return value.(int)%2 == 1 }, []any{1, 2, 3}, []bool{true, false, true}},
-		{"filter falsy to bool statement", "header", IntType, func(value any) bool { return is.Falsy(value) }, []any{1, 0, "", "a", false}, []bool{false, true, true, false, true}},
+		{"odd to bool", []int{1, 2, 3}, func(v int, i int) bool { return v%2 == 1 }, []bool{true, false, true}},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			series := newSeries(testCase.header, testCase.value, testCase.stype)
-			got := series.FilerToBoolStatement(testCase.fn)
-			if is.SameSlice(got, testCase.expected) == false {
-				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.MapToBool(tc.fn)
+			if !is.SameSlice(got.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, got.ToSlice())
 			}
 		})
 	}
 }
 
-func TestSeries_IntersectWithBoolStatement(t *testing.T) {
+func TestSeries_Reduce(t *testing.T) {
 	testCases := []struct {
-		name          string
-		header        string
-		stype         Type
-		value         []any
-		boolStatement []bool
-		expected      []any
-		expectedLen   int
+		name     string
+		value    []int
+		initial  int
+		fn       func(int, int, int) int
+		expected []int
 	}{
-		{"intersect with even bool statement", "header", IntType, []any{1, 2, 3}, []bool{false, true, false}, []any{2}, 1},
+		{"cumulative sum", []int{1, 2, 3, 4}, 0, func(last int, curr int, idx int) int { return last + curr }, []int{1, 3, 6, 10}},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			series := newSeries(testCase.header, testCase.value, testCase.stype)
-			got := series.IntersectWithBoolStatement(testCase.boolStatement)
-			if is.SameSlice(got.data, testCase.expected) == false {
-				t.Errorf("Expected %v, got %v", testCase.expected, got)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.Reduce(tc.initial, tc.fn)
+			if !is.SameSlice(got.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, got.ToSlice())
 			}
-			if got.Len() != testCase.expectedLen {
-				t.Errorf("Expected %v, got %v", testCase.expectedLen, got.Len())
+		})
+	}
+
+}
+
+func TestSeries_Agg(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []int
+		initial  int
+		fn       func(int, int, int) int
+		expected int
+	}{
+		{"aggregate sum", []int{1, 2, 3, 4}, 0, func(last int, curr int, idx int) int { return last + curr }, 10},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.Agg(tc.initial, tc.fn)
+			if got != tc.expected {
+				tt.Errorf("Expected %v, got %v", tc.expected, got)
 			}
 		})
 	}
 }
 
-func TestSeries_ApplyWithBoolStatement(t *testing.T) {
+func TestSeries_Any(t *testing.T) {
 	testCases := []struct {
-		name          string
-		header        string
-		stype         Type
-		value         []any
-		fn            func(any) any
-		boolStatement []bool
-		expected      []any
+		name     string
+		value    []string
+		fn       func(string) bool
+		expected bool
 	}{
-		{"apply multiply by 2 when even", "header", IntType, []any{1, 2, 3}, func(value any) any { return value.(int) * 2 }, []bool{false, true, false}, []any{1, 4, 3}},
+		{"any length > 2", []string{"a", "bb", "ccc"}, func(v string) bool { return len(v) > 2 }, true},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			series := newSeries(testCase.header, testCase.value, testCase.stype)
-			got := series.ApplyWithBoolStatement(testCase.boolStatement, testCase.fn)
-			if is.SameSlice(got.data, testCase.expected) == false {
-				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.Any(tc.fn)
+			if got != tc.expected {
+				tt.Errorf("Expected %v, got %v", tc.expected, got)
+			}
+		})
+	}
+
+}
+
+func TestSeries_All(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []string
+		fn       func(string) bool
+		expected bool
+	}{
+		{"all length >=1", []string{"a", "bb", "ccc"}, func(v string) bool { return len(v) >= 1 }, true},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.All(tc.fn)
+			if got != tc.expected {
+				tt.Errorf("Expected %v, got %v", tc.expected, got)
+			}
+		})
+	}
+}
+
+func TestSeries_IndexOf(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []string
+		lookFor  string
+		expected int
+	}{
+		{"index of bb", []string{"a", "bb", "ccc"}, "bb", 1},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.IndexOf(tc.lookFor)
+			if got != tc.expected {
+				tt.Errorf("Expected %v, got %v", tc.expected, got)
+			}
+		})
+	}
+}
+
+func TestSeries_Reverse(t *testing.T) {
+	testCases := []struct {
+		name     string
+		value    []string
+		expected []string
+	}{
+		{"reverse order", []string{"a", "bb", "ccc"}, []string{"ccc", "bb", "a"}},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			s := New(tc.value)
+			got := s.Reverse()
+			if !is.SameSlice(got.ToSlice(), tc.expected) {
+				tt.Errorf("Expected %v, got %v", tc.expected, got.ToSlice())
 			}
 		})
 	}
