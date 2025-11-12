@@ -421,3 +421,65 @@ func TestSeries_Reverse(t *testing.T) {
 		})
 	}
 }
+
+func TestSeries_ApplyBoolStatement(t *testing.T) {
+	testCases := []struct {
+		name          string
+		value         []string
+		boolStatement []bool
+		expected      []string
+	}{
+		{"apply bool statement", []string{"a", "bb", "ccc"}, []bool{true, false, true}, []string{"a", "ccc"}},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			seriesValue := New(testCase.value)
+			seriesBool := New(testCase.boolStatement)
+			got := seriesValue.ApplyBoolStatement(seriesBool)
+			if !is.SameSlice(got.ToSlice(), testCase.expected) {
+				tt.Errorf("Expected %v, got %v", testCase.expected, got.ToSlice())
+			}
+		})
+	}
+}
+
+func TestSeries_ApplyOrderStatement(t *testing.T) {
+	testCases := []struct {
+		name           string
+		value          []string
+		orderStatement []int
+		expected       []string
+	}{
+		{"apply order statement", []string{"a", "bb", "ccc"}, []int{2, 0, 1}, []string{"ccc", "a", "bb"}},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			seriesValue := New(testCase.value)
+			seriesOrder := New(testCase.orderStatement)
+			got := seriesValue.ApplyOrderStatement(seriesOrder)
+			if !is.SameSlice(got.ToSlice(), testCase.expected) {
+				tt.Errorf("Expected %v, got %v", testCase.expected, got.ToSlice())
+			}
+		})
+	}
+}
+
+func TestSeries_CountValue(t *testing.T) {
+	testCases := []struct {
+		name         string
+		value        []any
+		valueToCount any
+		expected     int
+	}{
+		{"count values", []any{1, 2, 2, 3}, 2, 2},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			seriesValue := New(testCase.value)
+			got := seriesValue.CountValue(2)
+			if got != testCase.expected {
+				tt.Errorf("Expected %v, got %v", testCase.expected, got)
+			}
+		})
+	}
+}

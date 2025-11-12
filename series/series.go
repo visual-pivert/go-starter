@@ -97,6 +97,34 @@ func (s Series[T]) MapToBool(fn func(value T, index int) bool) Series[bool] {
 	return Series[bool]{out}
 }
 
+func (s Series[T]) ApplyBoolStatement(boolStatement Series[bool]) Series[T] {
+	var out Series[T]
+	for i, value := range s.data {
+		if boolStatement.GetValue(i) {
+			out = out.Append([]T{value})
+		}
+	}
+	return out
+}
+
+func (s Series[T]) ApplyOrderStatement(orderStatement Series[int]) Series[T] {
+	var out Series[T]
+	for _, index := range orderStatement.ToSlice() {
+		out = out.Append([]T{s.data[index]})
+	}
+	return out
+}
+
+func (s Series[T]) CountValue(value T) int {
+	counter := 0
+	for _, v := range s.data {
+		if v == value {
+			counter++
+		}
+	}
+	return counter
+}
+
 func (s Series[T]) GetValue(index int) T {
 	return s.data[index]
 }
