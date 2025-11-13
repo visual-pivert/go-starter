@@ -1,8 +1,10 @@
 package fn
 
-func IndexOf[T comparable](value T, slice []T) int {
+import "reflect"
+
+func IndexOf[T any](value T, slice []T) int {
 	for i, v := range slice {
-		if v == value {
+		if reflect.DeepEqual(v, value) {
 			return i
 		}
 	}
