@@ -2,23 +2,31 @@ package series
 
 import (
 	"fmt"
+	"reflect"
+	"strings"
 
 	fnVisual "github.com/visual-pivert/go-starter/fn"
+	"github.com/visual-pivert/go-starter/is"
 )
 
-type Series[T comparable] struct {
+type Series[T any] struct {
 	data []T
+	t    string // "string" or "number" or "date" or "float" or "bool"
 }
 
-func New[T comparable](data []T) Series[T] {
-	return Series[T]{data}
+func New[T any](data []T, t string) Series[T] {
+	typePossibilities := []string{"string", "number", "date", "float", "bool"}
+	if is.In(t, typePossibilities) == false {
+		panic("type not supported")
+	}
+	return Series[T]{data, t}
 }
 
 func (s Series[T]) Append(values []T) Series[T] {
 	out := make([]T, 0, len(s.data)+len(values))
 	out = append(out, s.data...)
 	out = append(out, values...)
-	return Series[T]{out}
+	return Series[T]{out, s.t}
 }
 
 func (s Series[T]) AppendTo(pos int, values []T) Series[T] {
@@ -26,32 +34,32 @@ func (s Series[T]) AppendTo(pos int, values []T) Series[T] {
 	out = append(out, s.data[:pos]...)
 	out = append(out, values...)
 	out = append(out, s.data[pos:]...)
-	return Series[T]{out}
+	return Series[T]{out, s.t}
 }
 
 func (s Series[T]) Pop() (Series[T], T) {
 	out := make([]T, 0, len(s.data)-1)
 	out = append(out, s.data[:len(s.data)-1]...)
-	return Series[T]{out}, s.data[len(s.data)-1]
+	return Series[T]{out, s.t}, s.data[len(s.data)-1]
 }
 
 func (s Series[T]) Shift() (Series[T], T) {
 	out := make([]T, 0, len(s.data)-1)
 	out = append(out, s.data[1:]...)
-	return Series[T]{out}, s.data[0]
+	return Series[T]{out, s.t}, s.data[0]
 }
 
 func (s Series[T]) Remove(index int) Series[T] {
 	out := make([]T, 0, len(s.data)-1)
 	out = append(out, s.data[:index]...)
 	out = append(out, s.data[index+1:]...)
-	return Series[T]{out}
+	return Series[T]{out, s.t}
 }
 
 func (s Series[T]) Range(start int, nbr int) Series[T] {
 	out := make([]T, 0, nbr)
 	out = append(out, s.data[start:start+nbr]...)
-	return Series[T]{out}
+	return Series[T]{out, s.t}
 }
 
 func (s Series[T]) Len() int {
@@ -63,7 +71,15 @@ func (s Series[T]) Count() int {
 }
 
 func (s Series[T]) Debug() {
-	fmt.Println(s.data)
+	parts := make([]string, len(s.data))
+	for i, v := range s.data {
+		parts[i] = fmt.Sprintf("%v", v)
+	}
+	fmt.Printf("[%s]\n", strings.Join(parts, ", "))
+}
+
+func (s Series[T]) Type() string {
+	return s.t
 }
 
 func (s Series[T]) ToSlice() []T {
@@ -74,27 +90,27 @@ func (s Series[T]) ToSlice() []T {
 
 func (s Series[T]) Filter(fn func(value T) bool) Series[T] {
 	out := fnVisual.Filter(s.data, fn)
-	return Series[T]{out}
+	return Series[T]{out, s.t}
 }
 
 func (s Series[T]) FilterI(fn func(value T) bool) Series[int] {
 	out := fnVisual.FilterI(s.data, fn)
-	return Series[int]{out}
+	return Series[int]{out, s.t}
 }
 
 func (s Series[T]) Reduce(initialValue T, fn func(last T, curr T, currIndex int) T) Series[T] {
 	out := fnVisual.Reduce(s.data, initialValue, fn)
-	return Series[T]{out}
+	return Series[T]{out, s.t}
 }
 
 func (s Series[T]) Map(fn func(value T, index int) T) Series[T] {
 	out := fnVisual.Map(s.data, fn)
-	return Series[T]{out}
+	return Series[T]{out, s.t}
 }
 
 func (s Series[T]) MapToBool(fn func(value T, index int) bool) Series[bool] {
 	out := fnVisual.Map(s.data, fn)
-	return Series[bool]{out}
+	return Series[bool]{out, s.t}
 }
 
 func (s Series[T]) ApplyBoolStatement(boolStatement Series[bool]) Series[T] {
@@ -118,7 +134,7 @@ func (s Series[T]) ApplyOrderStatement(orderStatement Series[int]) Series[T] {
 func (s Series[T]) CountValue(value T) int {
 	counter := 0
 	for _, v := range s.data {
-		if v == value {
+		if reflect.DeepEqual(v, value) {
 			counter++
 		}
 	}
@@ -131,12 +147,12 @@ func (s Series[T]) GetValue(index int) T {
 
 func (s Series[T]) SetValue(index int, value T) Series[T] {
 	s.data[index] = value
-	return Series[T]{s.data}
+	return Series[T]{s.data, s.t}
 }
 
 func (s Series[T]) Reverse() Series[T] {
 	out := fnVisual.Reverse(s.data)
-	return Series[T]{out}
+	return Series[T]{out, s.t}
 }
 
 func (s Series[T]) Agg(initialValue T, fn func(last T, curr T, currIndex int) T) T {

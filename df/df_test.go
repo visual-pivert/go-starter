@@ -1,212 +1,303 @@
 package df
 
 import (
+	"fmt"
+	"reflect"
 	"testing"
 
-	"github.com/visual-pivert/go-starter/fn"
 	"github.com/visual-pivert/go-starter/is"
 	"github.com/visual-pivert/go-starter/series"
 )
 
-func createDf() *Df {
-	dataframe := New(
-		series.New("str", []any{"a", "b", "c"}, series.StringType),
-		series.New("int", []any{1, 2, 3}, series.IntType),
-		series.New("float", []any{1.1, 2.2, 3.3}, series.FloatType),
-		series.New("bool", []any{true, false, true}, series.BoolType),
-		series.New("time", []any{"2025/10/04", "2025/11/11", "2025/12/07"}, series.TimeType),
-	)
-	return dataframe
+// helpers
+func makeDF(cols [][]any, types []string, headers []string) *Dataframe {
+	ss := make([]series.Series[any], len(cols))
+	for i, c := range cols {
+		ss[i] = series.New(c, types[i])
+	}
+	return New(ss, headers)
 }
 
-func TestDf_Types(t *testing.T) {
-	testCases := []struct {
-		name           string
-		df             *Df
-		expected       []series.Type
-		expectedString []string
-	}{
-		{"types", createDf(), []series.Type{series.StringType, series.IntType, series.FloatType, series.BoolType, series.TimeType}, []string{"string", "int", "float", "bool", "time"}},
-	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			got := testCase.df.Types()
-			gotStr := testCase.df.TypesToString()
-			if !is.SameSlice(got, testCase.expected) {
-				tt.Errorf("Expected %v, got %v", testCase.expected, got)
-			}
-			if !is.SameSlice(gotStr, testCase.expectedString) {
-				tt.Errorf("Expected %v, got %v", testCase.expectedString, gotStr)
-			}
-		})
-	}
+func getCol(df *Dataframe, idx int) []any {
+	s, _ := df.GetSeries(idx)
+	return s.ToSlice()
 }
 
-func TestDf_GetSeries(t *testing.T) {
-	testCases := []struct {
-		name               string
-		df                 *Df
-		idx                int
-		expectedSeriesName string
-	}{
-		{"get str series", createDf(), 0, "str"},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			got := testCase.df.GetSeries(testCase.idx)
-			if got.Name() != testCase.expectedSeriesName {
-				t.Errorf("Expected %v, got %v", testCase.expectedSeriesName, got.Name())
-			}
-		})
-	}
-}
-
-func TestDf_GetSeriesByHeader(t *testing.T) {
-	testCases := []struct {
-		name               string
-		df                 *Df
-		headerName         string
-		expectedSeriesName string
-	}{
-		{"get str series by header", createDf(), "str", "str"},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			got := testCase.df.GetSeriesByHeader(testCase.headerName)
-			if got.Name() != testCase.expectedSeriesName {
-				t.Errorf("Expected %v, got %v", testCase.expectedSeriesName, got.Name())
-			}
-		})
-	}
-}
-
-func TestDf_RemoveSeries(t *testing.T) {
-	testCases := []struct {
-		name            string
-		df              *Df
-		idx             []int
-		expectedLen     int
-		expectedColumns []string
-	}{
-		{"Remove str series", createDf(), []int{0}, 4, []string{"int", "float", "bool", "time"}},
-	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			got := testCase.df.RemoveColumns(testCase.idx...)
-			testCase.df.Debug()
-			got.Debug()
-			if got.Shape()[1] != testCase.expectedLen {
-				tt.Errorf("Expected %v, got %v", testCase.expectedLen, got.Shape()[1])
-			}
-			if !is.SameSlice(got.columns, testCase.expectedColumns) {
-				tt.Errorf("Expected %v got %v", testCase.expectedColumns, got.columns)
-			}
-		})
-	}
-}
-
-func TestDf_RemoveSeriesByHeader(t *testing.T) {
-	testCases := []struct {
-		name            string
-		df              *Df
-		headers         []string
-		expectedLen     int
-		expectedColumns []string
-	}{
-		{"Remove str series", createDf(), []string{"str"}, 4, []string{"int", "float", "bool", "time"}},
-	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			got := testCase.df.RemoveColumnsByHeader(testCase.headers...)
-			if got.Shape()[1] != testCase.expectedLen {
-				tt.Errorf("Expected %v, got %v", testCase.expectedLen, got.Shape()[1])
-			}
-			if !is.SameSlice(got.columns, testCase.expectedColumns) {
-				tt.Errorf("Expected %v got %v", testCase.expectedColumns, got.columns)
-			}
-		})
-	}
-}
+func sliceEqualAny(a, b []any) bool { return reflect.DeepEqual(a, b) }
 
 func TestDf_Shape(t *testing.T) {
 	testCases := []struct {
 		name     string
-		df       *Df
+		cols     [][]any
+		headers  []string
+		types    []string
 		expected []int
 	}{
-		{"shape", createDf(), []int{3, 5}},
+		{
+			name:     "3x2",
+			cols:     [][]any{{1, 2, 3}, {"a", "b", "c"}},
+			headers:  []string{"number", "str"},
+			types:    []string{"number", "string"},
+			expected: []int{3, 2},
+		},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			got := testCase.df.Shape()
-			if !is.SameSlice(got, testCase.expected) {
-				tt.Errorf("Expected %v, got %v", testCase.expected, got)
-			}
 
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			df := makeDF(tc.cols, tc.types, tc.headers)
+			if !is.SameSlice(df.Shape(), tc.expected) {
+				t.Fatalf("Shape mismatch: got %v, expected %v", df.Shape(), tc.expected)
+			}
 		})
 	}
 }
 
-func TestDf_IntersectWithBoolStatement(t *testing.T) {
+func TestDf_RemoveColumns(t *testing.T) {
 	testCases := []struct {
-		name          string
-		df            *Df
-		boolStatement []bool
-		expectedShape []int
+		name            string
+		cols            [][]any
+		types           []string
+		headers         []string
+		removeIdx       []int
+		expectedHeaders []string
+		expectedCols    [][]any
 	}{
-		{"intersect with bool statement", createDf(), []bool{true, false, true}, []int{2, 5}},
+		{
+			name:            "remove single middle",
+			cols:            [][]any{{1, 2, 3}, {"a", "b", "c"}, {true, false, true}},
+			types:           []string{"number", "string", "bool"},
+			headers:         []string{"num", "str", "flag"},
+			removeIdx:       []int{1},
+			expectedHeaders: []string{"num", "flag"},
+			expectedCols:    [][]any{{1, 2, 3}, {true, false, true}},
+		},
+		{
+			name:            "remove multiple out-of-order",
+			cols:            [][]any{{1, 2}, {"a", "b"}, {true, false}, {10, 20}},
+			types:           []string{"number", "string", "bool", "number"},
+			headers:         []string{"n1", "s", "b", "n2"},
+			removeIdx:       []int{3, 1},
+			expectedHeaders: []string{"n1", "b"},
+			expectedCols:    [][]any{{1, 2}, {true, false}},
+		},
+		{
+			name:            "remove none (empty idx)",
+			cols:            [][]any{{1}, {"a"}},
+			types:           []string{"number", "string"},
+			headers:         []string{"n", "s"},
+			removeIdx:       []int{},
+			expectedHeaders: []string{"n", "s"},
+			expectedCols:    [][]any{{1}, {"a"}},
+		},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			got := testCase.df.IntersectWithBoolStatement(testCase.boolStatement)
-			if !is.SameSlice(got.Shape(), testCase.expectedShape) {
-				tt.Errorf("Expected %v, got %v", testCase.expectedShape, got.Shape())
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			df := makeDF(tc.cols, tc.types, tc.headers)
+			df.RemoveColumns(tc.removeIdx)
+
+			if !is.SameSlice(df.Shape(), []int{len(tc.cols[0]), len(tc.expectedCols)}) {
+				t.Fatalf("shape after RemoveColumns: got %v, expected rows=%d cols=%d", df.Shape(), len(tc.cols[0]), len(tc.expectedCols))
+			}
+			if !is.SameSlice(df.headers, tc.expectedHeaders) {
+				t.Fatalf("headers mismatch: got %v, expected %v", df.headers, tc.expectedHeaders)
+			}
+			for i := range tc.expectedCols {
+				if !sliceEqualAny(getCol(df, i), tc.expectedCols[i]) {
+					t.Fatalf("col %d mismatch: got %v, expected %v", i, getCol(df, i), tc.expectedCols[i])
+				}
 			}
 		})
 	}
 }
 
-func TestDf_GetLine(t *testing.T) {
+func TestDf_RemoveColumnsByHeaders(t *testing.T) {
+	testCases := []struct {
+		name            string
+		cols            [][]any
+		types           []string
+		headers         []string
+		removeHdrs      []string
+		expectedHeaders []string
+	}{
+		{
+			name:            "remove existing header",
+			cols:            [][]any{{1, 2, 3}, {"a", "b", "c"}, {true, false, true}},
+			types:           []string{"number", "string", "bool"},
+			headers:         []string{"num", "str", "flag"},
+			removeHdrs:      []string{"str"},
+			expectedHeaders: []string{"num", "flag"},
+		},
+		{
+			name:            "remove multiple headers",
+			cols:            [][]any{{1, 2, 3}, {"a", "b", "c"}, {true, false, true}},
+			types:           []string{"number", "string", "bool"},
+			headers:         []string{"num", "str", "flag"},
+			removeHdrs:      []string{"num", "flag"},
+			expectedHeaders: []string{"str"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			df := makeDF(tc.cols, tc.types, tc.headers)
+			df.RemoveColumnsByHeaders(tc.removeHdrs)
+			if !is.SameSlice(df.headers, tc.expectedHeaders) {
+				t.Fatalf("headers mismatch after RemoveColumnsByHeaders: got %v, expected %v", df.headers, tc.expectedHeaders)
+			}
+		})
+	}
+}
+
+func TestDf_RemoveLines(t *testing.T) {
 	testCases := []struct {
 		name         string
-		df           *Df
-		idx          int
-		expectedLine []any
+		cols         [][]any
+		types        []string
+		headers      []string
+		removeIdx    []int
+		expectedCols [][]any
 	}{
-		{"get line", createDf(), 0, []any{"a", 1, 1.1, true, "2025/10/04"}},
+		{
+			name:         "remove one middle row",
+			cols:         [][]any{{1, 2, 3, 4}, {"a", "b", "c", "d"}},
+			types:        []string{"number", "string"},
+			headers:      []string{"num", "str"},
+			removeIdx:    []int{1},
+			expectedCols: [][]any{{1, 3, 4}, {"a", "c", "d"}},
+		},
+		{
+			name:         "ignore out-of-range indices",
+			cols:         [][]any{{1, 2, 3}, {"a", "b", "c"}},
+			types:        []string{"number", "string"},
+			headers:      []string{"n", "s"},
+			removeIdx:    []int{-1, 3, 99},
+			expectedCols: [][]any{{1, 2, 3}, {"a", "b", "c"}},
+		},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			got := testCase.df.GetLine(testCase.idx)
-			if !is.SameSlice(got, testCase.expectedLine) {
-				tt.Errorf("Expected %v, got %v", testCase.expectedLine, got)
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			df := makeDF(tc.cols, tc.types, tc.headers)
+			df.RemoveLines(tc.removeIdx)
+			for i := range tc.expectedCols {
+				if !sliceEqualAny(getCol(df, i), tc.expectedCols[i]) {
+					t.Fatalf("unexpected col %d after RemoveLines: got %v, expected %v", i, getCol(df, i), tc.expectedCols[i])
+				}
 			}
 		})
 	}
 }
 
-func TestDf_GetLines(t *testing.T) {
+func TestDf_ApplyFromBoolStatement(t *testing.T) {
 	testCases := []struct {
 		name         string
-		df           *Df
-		idx          []int
-		expectedLine [][]any
+		cols         [][]any
+		types        []string
+		headers      []string
+		mask         []bool
+		expectedCols [][]any
 	}{
-		{"get lines", createDf(), []int{0, 1}, [][]any{{"a", 1, 1.1, true, "2025/10/04"}, {"b", 2, 2.2, false, "2025/11/11"}}},
+		{
+			name:         "filter alternating",
+			cols:         [][]any{{1, 2, 3, 4}, {"a", "b", "c", "d"}},
+			types:        []string{"number", "string"},
+			headers:      []string{"num", "str"},
+			mask:         []bool{true, false, true, false},
+			expectedCols: [][]any{{1, 3}, {"a", "c"}},
+		},
 	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(tt *testing.T) {
-			got := testCase.df.GetLines(testCase.idx...)
-			boolStatement := fn.Map(got, func(t []any, idx int) bool {
-				return is.SameSlice(t, testCase.expectedLine[idx])
-			})
-			isGood := fn.Any(boolStatement, func(b bool) bool {
-				return b == true
-			})
-			if !isGood {
-				tt.Errorf("Expected %v, got %v", testCase.expectedLine, got)
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			df := makeDF(tc.cols, tc.types, tc.headers)
+			df.ApplyFromBoolStatement(series.New(tc.mask, "bool"))
+			for i := range tc.expectedCols {
+				if !sliceEqualAny(getCol(df, i), tc.expectedCols[i]) {
+					t.Fatalf("unexpected col %d after mask: got %v, expected %v", i, getCol(df, i), tc.expectedCols[i])
+				}
+			}
+		})
+	}
+}
+
+func TestDf_ApplyFromOrderStatement(t *testing.T) {
+	testCases := []struct {
+		name         string
+		cols         [][]any
+		types        []string
+		headers      []string
+		order        []int
+		expectedCols [][]any
+	}{
+		{
+			name:         "permute rows",
+			cols:         [][]any{{10, 20, 30}, {"x", "y", "z"}},
+			types:        []string{"number", "string"},
+			headers:      []string{"num", "str"},
+			order:        []int{2, 0, 1},
+			expectedCols: [][]any{{30, 10, 20}, {"z", "x", "y"}},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			df := makeDF(tc.cols, tc.types, tc.headers)
+			df.ApplyFromOrderStatement(series.New(tc.order, "number"))
+			for i := range tc.expectedCols {
+				if !sliceEqualAny(getCol(df, i), tc.expectedCols[i]) {
+					t.Fatalf("unexpected col %d after order: got %v, expected %v", i, getCol(df, i), tc.expectedCols[i])
+				}
+			}
+		})
+	}
+}
+
+func TestDf_Compute(t *testing.T) {
+	testCases := []struct {
+		name       string
+		cols       [][]any
+		types      []string
+		headers    []string
+		resultType string
+		compute    func(d *Dataframe, idx int) any
+		expected   []any
+	}{
+		{
+			name:       "sum two ints",
+			cols:       [][]any{{1, 2, 3}, {4, 5, 6}},
+			types:      []string{"number", "number"},
+			headers:    []string{"a", "b"},
+			resultType: "number",
+			compute: func(d *Dataframe, idx int) any {
+				s0, _ := d.GetSeries(0)
+				s1, _ := d.GetSeries(1)
+				return s0.GetValue(idx).(int) + s1.GetValue(idx).(int)
+			},
+			expected: []any{5, 7, 9},
+		},
+		{
+			name:       "concat string and int",
+			cols:       [][]any{{"x", "y"}, {1, 2}},
+			types:      []string{"string", "number"},
+			headers:    []string{"s", "n"},
+			resultType: "string",
+			compute: func(d *Dataframe, idx int) any {
+				s0, _ := d.GetSeries(0)
+				s1, _ := d.GetSeries(1)
+				return fmt.Sprintf("%s-%d", s0.GetValue(idx).(string), s1.GetValue(idx).(int))
+			},
+			expected: []any{"x-1", "y-2"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			df := makeDF(tc.cols, tc.types, tc.headers)
+			df.Debug()
+			res := df.Compute(tc.resultType, tc.compute)
+			if !reflect.DeepEqual(res.ToSlice(), tc.expected) {
+				t.Fatalf("compute result mismatch: got %v, expected %v", res.ToSlice(), tc.expected)
 			}
 		})
 	}
