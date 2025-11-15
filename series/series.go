@@ -3,6 +3,7 @@ package series
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 
 	fnVisual "github.com/visual-pivert/go-starter/fn"
@@ -19,7 +20,94 @@ func New[T any](data []T, t string) Series[T] {
 	if is.In(t, typePossibilities) == false {
 		panic("type not supported")
 	}
+	coerced, ok := coerceIfAnySlice[T](data, t)
+	if ok {
+		return Series[T]{coerced, t}
+	}
 	return Series[T]{data, t}
+}
+
+func coerceIfAnySlice[T any](data []T, t string) ([]T, bool) {
+	rv := reflect.ValueOf(data)
+	if rv.Kind() != reflect.Slice {
+		return nil, false
+	}
+	elemT := rv.Type().Elem()
+	if elemT.Kind() != reflect.Interface {
+		return nil, false
+	}
+	dstElem := reflect.TypeOf((*T)(nil)).Elem()
+	if dstElem.Kind() != reflect.Interface {
+		return nil, false
+	}
+	n := rv.Len()
+	out := reflect.MakeSlice(reflect.SliceOf(dstElem), n, n)
+	for i := 0; i < n; i++ {
+		elem := rv.Index(i)
+		if elem.Kind() == reflect.Interface && elem.IsNil() {
+			out.Index(i).Set(reflect.ValueOf(zeroForType(t)))
+			continue
+		}
+		v := elem.Interface() // dynamic value
+		if s, ok := v.(string); ok && t != "string" {
+			if conv, okc := convertStringToType(strings.TrimSpace(s), t); okc {
+				out.Index(i).Set(reflect.ValueOf(conv))
+				continue
+			}
+			out.Index(i).Set(reflect.ValueOf(zeroForType(t)))
+			continue
+		}
+		out.Index(i).Set(reflect.ValueOf(v))
+	}
+	return out.Interface().([]T), true
+}
+
+func convertStringToType(s string, t string) (any, bool) {
+	switch t {
+	case "number":
+		if s == "" { // empty -> zero
+			return 0, true
+		}
+		if i, err := strconv.Atoi(s); err == nil {
+			return i, true
+		}
+		return nil, false
+	case "float":
+		if s == "" {
+			return 0.0, true
+		}
+		if f, err := strconv.ParseFloat(s, 64); err == nil {
+			return f, true
+		}
+		return nil, false
+	case "bool":
+		if s == "" {
+			return false, true
+		}
+		if b, err := strconv.ParseBool(s); err == nil {
+			return b, true
+		}
+		return nil, false
+	case "date":
+		return s, true
+	default:
+		return s, true
+	}
+}
+
+func zeroForType(t string) any {
+	switch t {
+	case "number":
+		return 0
+	case "float":
+		return 0.0
+	case "bool":
+		return false
+	case "date":
+		return ""
+	default:
+		return ""
+	}
 }
 
 func (s Series[T]) Append(values []T) Series[T] {

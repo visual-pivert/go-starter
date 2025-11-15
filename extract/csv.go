@@ -18,12 +18,12 @@ func parseCsv(content string, sep string) [][]string {
 	return out
 }
 
-func Csv(path string, sep string, headerIdx int) *df.Df {
+func Csv(path string, sep string, headerIdx int, types []string) *df.Dataframe {
 	fileContent, err := os.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
 	fileStr := string(fileContent)
 	parsed := parseCsv(fileStr, sep)
-	return df.FromRaw(parsed, headerIdx)
+	return df.FromRaw(parsed, types, headerIdx)
 }
