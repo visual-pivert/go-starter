@@ -25,6 +25,10 @@ func (df *Dataframe) GetSeries(idx int) (series.Series[any], string) {
 	return df.sheet[idx], df.headers[idx]
 }
 
+func (df *Dataframe) GetHeaders() []string {
+	return df.headers
+}
+
 func (df *Dataframe) GetSeriesByHeader(name string) (series.Series[any], string) {
 	idx := fnVisual.IndexOf(name, df.headers)
 	return df.GetSeries(idx)
@@ -102,7 +106,7 @@ func (df *Dataframe) Compute(t string, fn func(d *Dataframe, idx int) any) serie
 	slice := make([]any, rows)
 	s := series.New(slice, t)
 	for i := 0; i < rows; i++ {
-		s.SetValue(i, fn(df, i))
+		s = s.SetValue(i, fn(df, i))
 	}
 	return s
 }
