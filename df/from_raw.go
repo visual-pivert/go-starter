@@ -1,93 +1,45 @@
 package df
 
-import (
-	"reflect"
-	"strconv"
-	"strings"
-	"time"
+import "github.com/visual-pivert/go-starter/series"
 
-	"github.com/visual-pivert/go-starter/series"
-)
-
-func FromRaw(raw [][]string, headerIdx int) *Df {
-	headers := raw[headerIdx]
-	out := New()
-	for i := 0; i < len(headers); i++ {
-		var arr []any
-		for j := headerIdx + 1; j < len(raw); j++ {
-			arr = append(arr, raw[j][i])
-		}
-		out = out.AddSeries(series.New(headers[i], arr, getRawSliceType(arr)))
-	}
-	return out
-}
-
-func getRawSliceType(slice []any) series.Type {
-	dateFormats := []string{
-		time.RFC3339,
-		"2006-01-02",
-		"02/01/2006",
-		"2006/01/02",
-		"02-01-2006",
-		"2006-01-02 15:04:05",
+func FromRaw(data [][]string, types []string, headerId int) *Dataframe {
+	if len(data) == 0 || headerId < 0 || headerId >= len(data) {
+		return New(nil, []string{})
 	}
 
-	for _, v := range slice {
-		if v == nil {
-			continue
+	headers := data[headerId]
+	cols := len(headers)
+
+	startRow := headerId + 1
+	if startRow > len(data) {
+		return New(nil, headers)
+	}
+	rows := len(data) - startRow
+
+	dataframe := make([][]any, cols)
+	for c := 0; c < cols; c++ {
+		col := make([]any, rows)
+		for r := 0; r < rows; r++ {
+			row := data[startRow+r]
+			if c < len(row) {
+				col[r] = row[c]
+			} else {
+				col[r] = ""
+			}
 		}
+		dataframe[c] = col
+	}
 
-		switch val := v.(type) {
-		case int, int8, int16, int32, int64:
-			return series.IntType
-
-		case float32, float64:
-			return series.FloatType
-
-		case bool:
-			return series.BoolType
-
-		case time.Time:
-			return series.TimeType
-
-		case string:
-			s := strings.TrimSpace(val)
-			if s == "" {
-				continue
-			}
-
-			// Try to detect numeric or logical values
-			if _, err := strconv.ParseInt(s, 10, 64); err == nil {
-				return series.IntType
-			}
-			if _, err := strconv.ParseFloat(s, 64); err == nil {
-				return series.FloatType
-			}
-			if _, err := strconv.ParseBool(s); err == nil {
-				return series.BoolType
-			}
-
-			// Try multiple date formats
-			for _, format := range dateFormats {
-				if _, err := time.Parse(format, s); err == nil {
-					return series.TimeType
-				}
-			}
-
-			return series.StringType
-
-		default:
-			rv := reflect.ValueOf(val)
-			switch rv.Kind() {
-			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-				return series.IntType
-			case reflect.Float32, reflect.Float64:
-				return series.FloatType
-			case reflect.Bool:
-				return series.BoolType
-			}
+	if len(types) != cols {
+		types = make([]string, cols)
+		for i := 0; i < cols; i++ {
+			types[i] = "string"
 		}
 	}
 
-	return series.StringType // fallback if all nil or unknown
+	newDf := New(nil, []string{})
+	for idx, col := range dataframe {
+		newDf.Append(series.New[any](col, types[idx]), headers[idx])
+	}
+	return newDf
 }
