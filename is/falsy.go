@@ -1,5 +1,11 @@
 package is
 
+// Falsy returns true if the value is falsy.
+// 0, "", false, nil, []int{}, map[string]int{} are falsy values.
+// examples:
+//
+//	is.Falsy(0) // true
+//	is.Falsy("") // true
 func Falsy(value any) bool {
 	if value == nil {
 		return true

@@ -1,5 +1,11 @@
 package is
 
+// Zero returns true if the value is zero
+//
+//	examples:
+//		is.Zero(0) // true
+//		is.Zero(0.0) // true
+//		is.Zero("") // false
 func Zero(value any) bool {
 	switch v := value.(type) {
 	case int:

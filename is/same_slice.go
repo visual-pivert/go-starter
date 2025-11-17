@@ -1,5 +1,10 @@
 package is
 
+// SameSlice checks if two slices(1 dimensional) with primitive value are equal
+// examples:
+//
+//	is.SameSlice([]int{1, 2, 3}, []int{1, 2, 3}) // true
+//	is.SameSlice([]int{1, 2, 3}, []int{1, 2}) // false
 func SameSlice[T comparable](slice1 []T, slice2 []T) bool {
 	if len(slice1) != len(slice2) {
 		return false
