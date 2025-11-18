@@ -133,6 +133,7 @@ func TestSeries_Range(t *testing.T) {
 		expected []int
 	}{
 		{"slice middle", []int{1, 2, 3, 4}, "number", 1, 2, []int{2, 3}},
+		{"slice last", []int{1, 2, 3, 4}, "number", 1, 3, []int{2, 3, 4}},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(tt *testing.T) {
@@ -165,6 +166,8 @@ func TestSeries_Len_Count(t *testing.T) {
 		})
 	}
 }
+
+// TODO: expected slice is not []int but []any and we need to test type
 func TestSeries_ToSlice(t *testing.T) {
 	testCases := []struct {
 		name     string
