@@ -1,5 +1,6 @@
 // Package df provides a simple in-memory dataframe made of generic series.Series columns
 // and utility functions to slice, filter, reorder, and inspect tabular data.
+
 package df
 
 import (
