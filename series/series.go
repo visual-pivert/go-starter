@@ -1,6 +1,3 @@
-// series package contains a Series and many utilities for working with.
-// Series is a supercharged version of slices.
-
 package series
 
 import (
