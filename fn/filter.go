@@ -2,6 +2,11 @@ package fn
 
 import "github.com/visual-pivert/go-starter/is"
 
+// Filter returns a new slice with all elements that satisfy the predicate function.
+// Examples:
+//
+//	Filter([]int{1, 2, 3}, func(v int) bool { return v > 1 }) // [2, 3]
+
 func Filter[T any](slice []T, fn func(T) bool) []T {
 	var out []T
 	for _, value := range slice {
@@ -12,6 +17,10 @@ func Filter[T any](slice []T, fn func(T) bool) []T {
 	return out
 }
 
+// FilterI returns a new slice that contains indices that satisfies the predicate function.
+// Examples:
+//
+//	FilterI([]int{1, 2, 3}, func(v int) bool { return v > 1 }) // [1, 2] (indices)
 func FilterI[T any](slice []T, fn func(T) bool) []int {
 	var out []int
 	for i, value := range slice {
@@ -22,6 +31,10 @@ func FilterI[T any](slice []T, fn func(T) bool) []int {
 	return out
 }
 
+// FilterTruthy returns a new slice with all truthy values.
+// Examples:
+//
+//	FilterTruthy([]int{1, 0, 2}) // [1, 2]
 func FilterTruthy[T any](slice []T) []T {
 	var out []T
 	for _, value := range slice {
@@ -32,6 +45,10 @@ func FilterTruthy[T any](slice []T) []T {
 	return out
 }
 
+// FilterITruthy returns a new slice that contains indices of truthy values.
+// Examples:
+//
+//	FilterITruthy([]int{1, 0, 2}) // [0, 2] (indexes)
 func FilterITruthy[T any](slice []T) []int {
 	var out []int
 	for i, value := range slice {
@@ -42,6 +59,11 @@ func FilterITruthy[T any](slice []T) []int {
 	return out
 }
 
+// FilterToBoolStatement returns a new slice of bool with the same length as the input slice.
+// True if the predicate function returns true, false otherwise.
+// Examples:
+//
+//	FilterToBoolStatement([]int{1, 2, 3}, func(v int) bool { return v > 1 }) // [false, true, true]
 func FilterToBoolStatement[T any](slice []T, fn func(T) bool) []bool {
 	var out []bool
 	for _, value := range slice {
