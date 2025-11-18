@@ -167,7 +167,6 @@ func TestSeries_Len_Count(t *testing.T) {
 	}
 }
 
-// TODO: expected slice is not []int but []any and we need to test type
 func TestSeries_ToSlice(t *testing.T) {
 	testCases := []struct {
 		name     string
