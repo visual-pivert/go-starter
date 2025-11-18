@@ -2,6 +2,21 @@ package df
 
 import "github.com/visual-pivert/go-starter/series"
 
+// FromRaw creates a dataframe from raw data.
+// Example:
+//
+//	df.FromRaw([][]string{
+//		{"a", "b", "c"},
+//		{"1", "2", "3"},
+//		{"4", "5", "6"},
+//	}, nil, 0)
+//	df.Debug()
+//
+// Output:
+// | a | b | c |
+// ---
+// | 1 | 2 | 3 |
+// | 4 | 5 | 6 |
 func FromRaw(data [][]string, types []string, headerId int) *Dataframe {
 	if len(data) == 0 || headerId < 0 || headerId >= len(data) {
 		return New(nil, []string{})
