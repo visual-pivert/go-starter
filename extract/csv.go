@@ -8,6 +8,7 @@ import (
 	"github.com/visual-pivert/go-starter/fn"
 )
 
+// parseCsv splits a csv string into rows.
 func parseCsv(content string, sep string) [][]string {
 	split := strings.Split(content, "\n")
 	split = fn.FilterTruthy(split)
@@ -18,6 +19,10 @@ func parseCsv(content string, sep string) [][]string {
 	return out
 }
 
+// Csv reads a csv file and returns a dataframe(check out df package for more info).
+// Examples:
+//
+//	extract.Csv("data.csv", ",", 0, []string{"int", "string"}) // return dataframe
 func Csv(path string, sep string, headerIdx int, types []string) *df.Dataframe {
 	fileContent, err := os.ReadFile(path)
 	if err != nil {

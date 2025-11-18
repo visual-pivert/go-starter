@@ -96,10 +96,10 @@ type inlineStr struct {
 	T string `xml:"t"`
 }
 
-// Excel reads an .xlsx file and returns a Dataframe.
-// Improvements:
-// - Accept sheet by human-readable name (exact match); fallback to previous behavior if not found
-// - Convert date/time cells to ISO 8601 strings based on styles.xml and workbook date1904 setting
+// Excel reads an .xlsx file and returns a Dataframe (check out df package for more info).
+// Examples:
+//
+// extract.Excel("data.xlsx", "Sheet1", []string{"int", "string"}, 0) // return dataframe
 func Excel(path string, sheet string, types []string, headerIdx int) *df.Dataframe {
 	reader, err := zip.OpenReader(path)
 	if err != nil {
